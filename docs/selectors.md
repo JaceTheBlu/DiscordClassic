@@ -6,11 +6,11 @@ Status of each `RULES` entry in `index.tsx`. Nothing is verified yet.
 
 | Option | Selector | Status | Checked on (date, Discord build) |
 | --- | --- | --- | --- |
-| hideNitroTab | `[data-list-item-id$="___nitro"]` | unverified | |
-| hideShop | `[data-list-item-id$="___shop"]` | unverified | |
-| hideGiftButton | `[aria-label="Send a gift"]` | unverified, depends on client language | |
-| hideQuests | `[data-list-item-id$="___quests"]` | unverified | |
-| hideAvatarDecorations | `[class*="avatarDecoration"]` | unverified, class based (fragile) | |
+| hideNitroTab | `[data-list-item-id$='___nitro']` | unverified | |
+| hideShop | `[data-list-item-id$='___shop']` | unverified | |
+| hideGiftButton | `[aria-label='Send a gift']` | unverified, depends on client language | |
+| hideQuests | `[data-list-item-id$='___quests']` | unverified | |
+| hideAvatarDecorations | `[class*='avatarDecoration']` | unverified, class based (fragile) | |
 
 ## How to validate
 

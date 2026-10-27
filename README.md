@@ -35,4 +35,16 @@ Update later with `git -C src/userplugins/DiscordClassic pull`, then rebuild.
 
 Then enable **DiscordClassic** in Vencord settings. Toggles apply live, no restart needed.
 
+## Dev container
+
+Open this repo in VS Code and choose **Reopen in Container** (needs Docker). The container clones Vencord, installs its dependencies and mounts this repo at `src/userplugins/DiscordClassic`. Then, from `/home/node/Vencord`:
+
+```bash
+pnpm build --dev                                # build with the plugin
+pnpm lint src/userplugins/DiscordClassic        # lint the plugin only
+pnpm testTsc                                    # typecheck
+```
+
+The container cannot inject into Discord: run `pnpm inject` from a Vencord checkout on the host to test in the real client. To build against a specific Vencord version, set the `VENCORD_REF` build arg in `.devcontainer/devcontainer.json`.
+
 The plugin sits at the repo root on purpose: Vencord only loads `src/userplugins/<folder>/index.tsx`, one level deep.
