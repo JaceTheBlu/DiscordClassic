@@ -37,7 +37,7 @@ Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoPro
 
 Discord itself can turn off some of these, no plugin needed (setting names from Vencord's typings of Discord's AccessibilityStore, look under User Settings > Accessibility): display name styles (fonts and glow on names), and the GIF, sticker, emoji and apps buttons of the chat bar.
 
-The plugin settings have a **Handled elsewhere** section with buttons to both. The removal mode is picked with two cards at the top, and "Experimental: block by URL" only shows in Block mode.
+The plugin settings have a **Handled elsewhere** section with buttons to both. Each zone has All / None buttons (Freeze animations is left out, it needs a restart). The removal mode is picked with two cards at the top, and "Experimental: block by URL" only shows in Block mode.
 
 Planned: profile effects, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 

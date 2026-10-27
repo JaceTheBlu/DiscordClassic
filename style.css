@@ -191,3 +191,16 @@
     background: var(--brand-500);
     color: white;
 }
+
+.vc-dclassic-section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.vc-dclassic-restart {
+    color: var(--text-warning, var(--status-warning));
+    font-weight: 600;
+}
