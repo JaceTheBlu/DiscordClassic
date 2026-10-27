@@ -11,13 +11,13 @@ Discord is a trademark of Discord Inc., mentioned only to describe what this plu
 
 A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord marketing and recent additions to get a "classic" interface back. One plugin, one independent toggle per feature.
 
-> Status: phase 1 (personal userplugin). Most selectors are not validated yet, see [docs/selectors.md](docs/selectors.md).
+> Status: phase 1 (personal userplugin). Selector validation status: [docs/selectors.md](docs/selectors.md).
 
 ## Options
 
 Settings are grouped by zone, each with a short explanation in the Vencord settings.
 
-**Removal mode**: *Hide* (default) hides elements with CSS, they are still downloaded. *Filter* also stops cosmetic images and animations from being downloaded, for options marked "(filterable)". Filter patterns are added only once confirmed from a selector report, so for now Filter behaves like Hide.
+**Removal mode**: *Hide* (default) hides elements with CSS, they are still downloaded. *Filter* also stops cosmetic images and animations from being downloaded, for options marked "(filterable)". Filter patterns are added only once confirmed from a selector report.
 
 | Zone | Option | Default |
 | --- | --- | --- |
@@ -26,7 +26,8 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Marketing | Gift button | on |
 | Recent additions | Quests | off |
 | Other users' cosmetics | Avatar decorations (filterable) | off |
-| Other users' cosmetics | Server tags | off |
+| Other users' cosmetics | Nameplates (filterable) | off |
+| Other users' cosmetics | Server tags (filterable) | off |
 
 Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).
 
