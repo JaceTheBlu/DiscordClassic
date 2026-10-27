@@ -19,6 +19,8 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 
 **Removal mode**: *Hide* (default) hides elements with CSS, Discord still downloads them. *Block* works like an ad blocker: for options marked "(blockable)", Discord's code is patched so the content is never fetched, and the rest is hidden. *Experimental: block by URL* extends Block to options with no patch yet, by hooking browser functions; it may trigger Discord's anti-bot captchas, keep it off unless you need it.
 
+**Blocked counter**: like uBlock Origin's badge, the settings page shows how many files Block mode kept Discord from downloading, this session and since install, with an estimate of the data saved. Each file counts once per session. The data figure uses average file sizes, so treat it as an order of magnitude. Time saved is not measured.
+
 | Zone | Option | Default |
 | --- | --- | --- |
 | Marketing | Nitro tab | on |

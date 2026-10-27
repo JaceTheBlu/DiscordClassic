@@ -5,12 +5,16 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { Button } from "@components/Button";
 import { HeadingSecondary } from "@components/Heading";
+import { Paragraph } from "@components/Paragraph";
 import { copyWithToast } from "@utils/discord";
 import definePlugin, { OptionType } from "@utils/types";
+import { useEffect, useState } from "@webpack/common";
 
 import { buildReport } from "./diagnostics";
 import { setFilterPatterns } from "./filter";
+import { formatKb, getStats, loadStats, recordBlocked, resetStats, StatKey } from "./stats";
 
 const STYLE_ID = "vc-discord-classic";
 
@@ -40,7 +44,10 @@ function stop() {
 
 // Hidden elements stay in the DOM, so the scan sees them even while rules are active.
 function copySelectorReport() {
-    const report = buildReport(RULES, settings.store, plugin.patches!.map(p => String(p.find)));
+    const report = {
+        ...buildReport(RULES, settings.store, plugin.patches!.map(p => String(p.find))),
+        blocked: getStats(),
+    };
     copyWithToast(JSON.stringify(report, null, 2), "DiscordClassic: selector report copied");
 }
 
@@ -59,6 +66,35 @@ const section = (title: string) => ({
     component: () => <HeadingSecondary style={{ marginTop: 16 }}>{title}</HeadingSecondary>,
 });
 
+// Live counter like uBlock's badge. Sizes are averages, so the data figure is an estimate.
+function BlockedCounter() {
+    const [stats, setStats] = useState(getStats);
+    useEffect(() => {
+        const id = setInterval(() => setStats(getStats()), 1000);
+        return () => clearInterval(id);
+    }, []);
+
+    const sessionCount = stats.rows.reduce((sum, r) => sum + r.session, 0);
+    const totalCount = stats.rows.reduce((sum, r) => sum + r.total, 0);
+
+    return (
+        <div>
+            <HeadingSecondary>Blocked</HeadingSecondary>
+            <Paragraph>
+                This session: {sessionCount} files, about {formatKb(stats.sessionKb)} not downloaded.
+                Since install: {totalCount} files, about {formatKb(stats.totalKb)}.
+            </Paragraph>
+            {stats.rows.filter(r => r.total).map(r => (
+                <Paragraph key={r.key}>{r.label}: {r.session} this session, {r.total} total</Paragraph>
+            ))}
+            <Paragraph>Counts distinct files in Block mode only. Data is estimated from average file sizes.</Paragraph>
+            <Button size="small" variant="secondary" style={{ marginTop: 8 }} onClick={() => { resetStats(); setStats(getStats()); }}>
+                Reset counter
+            </Button>
+        </div>
+    );
+}
+
 const settings = definePluginSettings({
     mode: {
         type: OptionType.SELECT,
@@ -69,6 +105,10 @@ const settings = definePluginSettings({
             { label: "Block", value: "filter" },
         ],
         onChange: apply,
+    },
+    blockedCounter: {
+        type: OptionType.COMPONENT,
+        component: BlockedCounter,
     },
     urlBlocking: {
         type: OptionType.BOOLEAN,
@@ -141,23 +181,28 @@ const plugin = definePlugin({
             find: "getAvatarDecorationURL:",
             replacement: {
                 match: /(?<=function \i\(\i\){)(?=let{avatarDecoration)/,
-                replace: "if($self.blocks(\"hideAvatarDecorations\"))return;",
+                // The first argument holds the decoration, its asset names the file (as in Decor).
+                replace: "if($self.blocks(\"hideAvatarDecorations\",arguments[0]?.avatarDecoration))return;",
             },
         },
         {
             // Block mode: the badge URL builder returns nothing (code seen in a report, discord/1.0.9265).
             find: "/clan-badges/",
             replacement: {
-                match: /(?=let{CDN_HOST:\i}=window\.GLOBAL_ENV;if\(null==\i\)return;let \i=\i\.\i\[\i\];return`https:\/\/\$\{\i\}\/clan-badges\/)/,
-                replace: "if($self.blocks(\"hideClanTags\"))return;",
+                // Inserted after Discord's own null check, so only real badges get counted.
+                match: /(?<=let{CDN_HOST:\i}=window\.GLOBAL_ENV;if\(null==\i\)return;)(?=let \i=\i\.\i\[\i\];return`https:\/\/\$\{\i\}\/clan-badges\/)/,
+                replace: "if($self.blocks(\"hideClanTags\",[...arguments].join()))return;",
             },
         },
         {
             // Block mode: member list rows get no nameplate, so nothing is fetched (code seen in a report, discord/1.0.9265).
+            // Two modules contain this find: the row component and the list rendering it. Only the list matches.
             find: "onClickPremiumGuildIcon:",
+            all: true,
+            noWarn: true,
             replacement: {
                 match: /(?<=,nameplate:)(\i)(?=,onClick:)/g,
-                replace: "$self.blocks(\"hideNameplates\")?void 0:$1",
+                replace: "$self.blocks(\"hideNameplates\",$1)?void 0:$1",
             },
         },
         // Freeze animations: inverse of Vencord's AlwaysAnimate patches.
@@ -187,8 +232,16 @@ const plugin = definePlugin({
         "Copy selector report": copySelectorReport,
     },
     copySelectorReport,
-    blocks: (key: RuleKey) => isBlocking() && settings.store[key],
-    start: apply,
+    // Called by the block patches on every render. item identifies the file for the counter.
+    blocks(key: StatKey & RuleKey, item?: unknown) {
+        if (!isBlocking() || !settings.store[key]) return false;
+        recordBlocked(key, item);
+        return true;
+    },
+    start() {
+        loadStats();
+        apply();
+    },
     stop,
 });
 
