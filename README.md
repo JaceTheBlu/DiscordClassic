@@ -35,7 +35,15 @@ pnpm inject
 
 All commands run from the Vencord root and work the same in bash and PowerShell.
 
-Update later with `git -C src/userplugins/DiscordClassic pull`, then rebuild.
+Update later, from the Vencord root in PowerShell:
+
+```powershell
+.\src\userplugins\DiscordClassic\update.ps1            # pull the plugin, rebuild
+.\src\userplugins\DiscordClassic\update.ps1 -Vencord   # also pull Vencord
+.\src\userplugins\DiscordClassic\update.ps1 -Restart   # restart Discord after the build
+```
+
+If PowerShell refuses to run scripts, run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`. On bash: `git -C src/userplugins/DiscordClassic pull && pnpm build --dev`.
 
 Then enable **DiscordClassic** in Vencord settings. Toggles apply live, no restart needed.
 
