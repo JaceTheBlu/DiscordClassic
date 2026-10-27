@@ -201,7 +201,10 @@ function scanButtonLabels() {
 }
 
 // Code around CDN paths in Discord's webpack modules, to write Block mode patches from real code.
-const CODE_NEEDLES = ["clan-badges", "collectibles-shop", "nameplate", "quests/@me", "profileEffectId", "profile_effects", "custom-profile-frame"];
+const CODE_NEEDLES = [
+    "clan-badges", "collectibles-shop", "nameplate", "quests/@me",
+    // Render code of profile effects and frames, to write their Block patches.
+    "profileEffect:", "profileFrame:", "profileFrameStyle", "assets/content"];
 
 function scanCode() {
     const result: Record<string, { module: string; snippets: string[]; }[]> = {};
