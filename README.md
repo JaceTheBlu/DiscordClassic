@@ -24,12 +24,14 @@ Vencord must be built from source.
 git clone https://github.com/Vendicated/Vencord
 cd Vencord
 pnpm install
-mkdir -p src/userplugins && cd src/userplugins
-git clone https://github.com/JaceTheBlu/DiscordClassic
-cd ../..
+git clone https://github.com/JaceTheBlu/DiscordClassic src/userplugins/DiscordClassic
 pnpm build --dev   # or: pnpm watch
 pnpm inject
 ```
+
+All commands run from the Vencord root and work the same in bash and PowerShell.
+
+Update later with `git -C src/userplugins/DiscordClassic pull`, then rebuild.
 
 Then enable **DiscordClassic** in Vencord settings. Toggles apply live, no restart needed.
 
