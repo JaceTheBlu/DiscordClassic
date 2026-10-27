@@ -8,6 +8,7 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 - `diagnostics.ts`: `buildReport` scans the DOM for selector discovery, exposed as the **Copy selector report** toolbox action. Discovery only, it never picks selectors.
 - `docs/selectors.md`: selector validation status and DevTools procedure. Read it before touching `RULES`.
 - `README.md`: user facing install and option list.
+- `update.ps1`: Windows update script (pull plugin, optional `-Vencord` pull, rebuild, optional `-Restart` of Discord). Must stay compatible with Windows PowerShell 5.1 (no `&&`, no `??`).
 - `.devcontainer/`: build, lint and typecheck inside a real Vencord tree, see [.devcontainer/CLAUDE.md](.devcontainer/CLAUDE.md).
 
 ## Rules
