@@ -25,7 +25,15 @@ const KEYWORDS = [
     // "orb" alone also matches "colorBrand" and "indicatorBottom".
     "orbs",
     "banner",
+    "upsell",
+    "coachmark",
 ] as const;
+
+// Visible texts of popups with no known class: the report lists the classes of their ancestors.
+const TEXTS = [
+    "Give their style a spin",
+] as const;
+const TEXT_ANCESTORS = 8;
 
 const STABLE_ATTRS = ["data-list-item-id", "aria-label", "href", "role", "data-tab-id"];
 const MAX_SAMPLES = 8;
@@ -129,6 +137,19 @@ function scanKeywords() {
     return result;
 }
 
+function scanTexts() {
+    const result: Record<string, ElementInfo[][]> = {};
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const text = TEXTS.find(t => node!.textContent?.includes(t));
+        if (!text) continue;
+        const chain: ElementInfo[] = [];
+        for (let el = node.parentElement; el && chain.length < TEXT_ANCESTORS; el = el.parentElement) chain.push(describe(el));
+        (result[text] ??= []).push(chain);
+    }
+    return result;
+}
+
 function mediaGroup(src: string) {
     let url: URL;
     try {
@@ -216,6 +237,7 @@ export function buildReport(rules: Record<string, string>, enabled: Record<strin
             ])
         ),
         keywords: scanKeywords(),
+        texts: scanTexts(),
         media: scanMedia(),
         buttons: scanButtonLabels(),
         code: scanCode(),
