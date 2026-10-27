@@ -125,7 +125,27 @@ function scanKeywords() {
     return result;
 }
 
-export function buildReport(rules: Record<string, string>, enabled: Record<string, boolean>) {
+// Groups every media URL on the page by host and first two path segments,
+// e.g. "cdn.discordapp.com/avatar-decoration-presets/<id>", to find Filter mode patterns.
+function scanMedia() {
+    const groups: Record<string, { count: number; example: string; }> = {};
+    for (const el of document.querySelectorAll("img[src], video[src], source[src]")) {
+        let url: URL;
+        try {
+            url = new URL((el as HTMLImageElement).src);
+        } catch {
+            continue;
+        }
+        if (!url.protocol.startsWith("http")) continue;
+        const [first = "", second = ""] = url.pathname.split("/").filter(Boolean);
+        const key = `${url.host}/${first}/${/^\d+$/.test(second) ? "<id>" : second}`;
+        groups[key] ??= { count: 0, example: url.origin + url.pathname };
+        groups[key].count++;
+    }
+    return Object.fromEntries(Object.entries(groups).sort((a, b) => b[1].count - a[1].count));
+}
+
+export function buildReport(rules: Record<string, string>, enabled: Record<string, unknown>) {
     return {
         date: new Date().toISOString(),
         userAgent: navigator.userAgent,
@@ -133,9 +153,10 @@ export function buildReport(rules: Record<string, string>, enabled: Record<strin
         rules: Object.fromEntries(
             Object.entries(rules).map(([key, selector]) => [
                 key,
-                { selector, enabled: enabled[key], ...countMatches(selector) },
+                { selector, enabled: Boolean(enabled[key]), ...countMatches(selector) },
             ])
         ),
         keywords: scanKeywords(),
+        media: scanMedia(),
     };
 }

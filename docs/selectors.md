@@ -28,6 +28,7 @@ The plugin can scan the page for you. Open the view to check (for example a serv
 A JSON report is copied to the clipboard (code in `diagnostics.ts`):
 
 - `rules`: for each `RULES` entry, how many elements it matches right now, and a sample. `count: 0` means the selector is wrong or the element is not on screen.
+- `media`: every img/video URL on screen, grouped by host and path prefix. Source for Filter mode patterns.
 - `keywords`: elements whose class contains a known fragment (`nameplate`, `clan`, `decoration`, `quest`...), with hash suffixes removed, their stable attributes, and the closest ancestor (`anchor`) that has one.
 
 The report can contain usernames (from `aria-label`) and the current channel path.
