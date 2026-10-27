@@ -161,7 +161,9 @@ const FILTERS: Partial<Record<RuleKey, RegExp[]>> = {
 
 const plugin = definePlugin({
     name: "DiscordClassic",
-    description: "Hides Discord marketing and recent additions for a classic UI",
+    description: "Blocks or hides Discord marketing, upsells and other users' paid cosmetics for a classic interface",
+    // Installed on purpose (install.ps1 or a source build), so it starts enabled.
+    enabledByDefault: true,
     // TODO: replace 0n with your Discord user ID. Move to Devs in src/utils/constants.ts for the upstream PR.
     authors: [{ name: "JaceTheBlu", id: 0n }],
     settings,

@@ -12,6 +12,8 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 - `diagnostics.ts`: `buildReport` scans the DOM for selector discovery, exposed as the **Copy selector report** toolbox action. Discovery only, it never picks selectors.
 - `docs/selectors.md`: selector validation status and DevTools procedure. Read it before touching `RULES`.
 - `README.md`: user facing install and option list.
+- `install.ps1`: one-line Windows install for non developers (`irm ... | iex`). Downloads the `latest` release files to `%APPDATA%\DiscordClassic\dist` and runs the official Vencord installer CLI with `VENCORD_USER_DATA_DIR` + `VENCORD_DEV_INSTALL=1`, `-Uninstall` reverts. Same PowerShell 5.1 rule as `update.ps1`.
+- `.github/workflows/release.yml`: builds Vencord `main` + this plugin (`pnpm build --standalone`) and publishes the `latest` release. `VENCORD_REMOTE` = this repo and `VENCORD_HASH` = plugin short hash, so Vencord's HTTP updater follows this repo's releases (it compares the release name's last word with the build hash). Runs on PRs as a build check, publishes only from `main`.
 - `update.ps1`: Windows update script (pull plugin, optional `-Vencord` pull, rebuild, optional `-Restart` of Discord). Must stay compatible with Windows PowerShell 5.1 (no `&&`, no `??`).
 - `.devcontainer/`: build, lint and typecheck inside a real Vencord tree, see [.devcontainer/CLAUDE.md](.devcontainer/CLAUDE.md).
 
