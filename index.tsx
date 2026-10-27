@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { definePluginSettings } from "@api/Settings";
 import { Button } from "@components/Button";
 import { HeadingSecondary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
+import { openPluginModal } from "@components/settings";
 import { copyWithToast } from "@utils/discord";
 import definePlugin, { OptionType } from "@utils/types";
-import { useEffect, useState } from "@webpack/common";
+import { SettingsRouter, useEffect, useState } from "@webpack/common";
 
 import { buildReport } from "./diagnostics";
 import { setFilterPatterns } from "./filter";
@@ -95,6 +97,27 @@ function BlockedCounter() {
     );
 }
 
+// Things Discord or another Vencord plugin already removes: link to them instead of duplicating.
+function HandledElsewhere() {
+    const themesOn = isPluginEnabled("NoProfileThemes");
+    return (
+        <div>
+            <Paragraph>
+                Profile themes (gradient profile backgrounds): Vencord's NoProfileThemes plugin{themesOn ? " is enabled." : " removes them."}
+            </Paragraph>
+            <Button size="small" variant="secondary" style={{ margin: "4px 0 12px" }} onClick={() => openPluginModal(plugins.NoProfileThemes)}>
+                Open NoProfileThemes
+            </Button>
+            <Paragraph>
+                Display name styles (fonts and glow on names) and the GIF, sticker, emoji and apps buttons of the message bar: Discord's own Accessibility settings.
+            </Paragraph>
+            <Button size="small" variant="secondary" style={{ marginTop: 4 }} onClick={() => SettingsRouter.openUserSettings("accessibility_panel")}>
+                Open Accessibility settings
+            </Button>
+        </div>
+    );
+}
+
 const settings = definePluginSettings({
     mode: {
         type: OptionType.SELECT,
@@ -137,6 +160,12 @@ const settings = definePluginSettings({
         restartNeeded: true,
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
+
+    sectionElsewhere: section("Handled elsewhere"),
+    handledElsewhere: {
+        type: OptionType.COMPONENT,
+        component: HandledElsewhere,
+    },
 });
 
 // Validation status of each selector lives in docs/selectors.md: Discord changes its markup every build.
