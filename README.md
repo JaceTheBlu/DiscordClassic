@@ -2,7 +2,7 @@
 
 A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord marketing and recent additions to get a "classic" interface back. One plugin, one independent toggle per feature.
 
-> Status: phase 1 (personal userplugin). Selectors are not validated yet, see [docs/selectors.md](docs/selectors.md).
+> Status: phase 1 (personal userplugin). Most selectors are not validated yet, see [docs/selectors.md](docs/selectors.md).
 
 ## Options
 
@@ -13,6 +13,7 @@ A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord
 | Hide gift button | on | CSS |
 | Hide Quests | off | CSS |
 | Hide avatar decorations | off | CSS |
+| Hide server tags | off | CSS |
 
 Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).
 
