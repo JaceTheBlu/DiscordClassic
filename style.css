@@ -1,0 +1,193 @@
+/* Settings page of DiscordClassic. Colors come from Discord's theme variables, so light and dark both work. */
+
+.vc-dclassic-muted {
+    color: var(--text-muted);
+}
+
+.vc-dclassic-section {
+    margin-top: 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--background-mod-normal, rgb(128 128 128 / 20%));
+}
+
+/* Mode picker */
+.vc-dclassic-modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.vc-dclassic-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    text-align: left;
+    border-radius: 8px;
+    border: 2px solid var(--background-mod-normal, rgb(128 128 128 / 20%));
+    background: none;
+    color: var(--text-default, var(--text-normal));
+    cursor: pointer;
+}
+
+.vc-dclassic-mode:hover {
+    border-color: var(--text-muted);
+}
+
+.vc-dclassic-mode-active,
+.vc-dclassic-mode-active:hover {
+    border-color: var(--brand-500);
+}
+
+.vc-dclassic-mode-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.vc-dclassic-mode-text {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Blocked dashboard */
+.vc-dclassic-card {
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--background-mod-normal, rgb(128 128 128 / 20%));
+}
+
+.vc-dclassic-card-head,
+.vc-dclassic-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.vc-dclassic-card-foot {
+    margin-top: 12px;
+}
+
+.vc-dclassic-segmented {
+    display: flex;
+    padding: 2px;
+    border-radius: 6px;
+    background: var(--background-mod-normal, rgb(128 128 128 / 20%));
+}
+
+.vc-dclassic-segment {
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.vc-dclassic-segment-active {
+    background: var(--background-base-lower, var(--background-primary));
+    color: var(--text-default, var(--text-normal));
+}
+
+.vc-dclassic-tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0 16px;
+}
+
+.vc-dclassic-tile {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--background-mod-subtle, rgb(128 128 128 / 10%));
+}
+
+.vc-dclassic-tile-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-default, var(--text-normal));
+    font-variant-numeric: tabular-nums;
+}
+
+.vc-dclassic-tile-label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.vc-dclassic-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.vc-dclassic-bar-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 48px;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-default, var(--text-normal));
+}
+
+.vc-dclassic-bar-track {
+    height: 10px;
+    border-radius: 4px;
+    background: var(--background-mod-subtle, rgb(128 128 128 / 10%));
+}
+
+.vc-dclassic-bar-fill {
+    height: 100%;
+    min-width: 4px;
+    border-radius: 4px;
+    background: var(--brand-500);
+    transition: width 0.3s ease;
+}
+
+.vc-dclassic-bar-row:hover .vc-dclassic-bar-fill {
+    filter: brightness(1.15);
+}
+
+.vc-dclassic-bar-value {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-muted);
+}
+
+/* Handled elsewhere */
+.vc-dclassic-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.vc-dclassic-link-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--background-mod-subtle, rgb(128 128 128 / 10%));
+}
+
+.vc-dclassic-link-title {
+    font-weight: 600;
+    color: var(--text-default, var(--text-normal));
+}
+
+.vc-dclassic-badge {
+    margin-left: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--brand-500);
+    color: white;
+}

@@ -4,23 +4,18 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { definePluginSettings } from "@api/Settings";
-import { Button } from "@components/Button";
-import { HeadingSecondary } from "@components/Heading";
-import { Paragraph } from "@components/Paragraph";
-import { openPluginModal } from "@components/settings";
 import { copyWithToast } from "@utils/discord";
 import definePlugin, { OptionType } from "@utils/types";
-import { SettingsRouter, useEffect, useState } from "@webpack/common";
 
 import { buildReport } from "./diagnostics";
 import { setFilterPatterns } from "./filter";
-import { formatKb, getStats, loadStats, recordBlocked, resetStats, StatKey } from "./stats";
+import { getStats, loadStats, recordBlocked, StatKey } from "./stats";
+import { BlockedDashboard, HandledElsewhere, ModePicker, Section } from "./ui";
 
 const STYLE_ID = "vc-discord-classic";
 
-function apply() {
+export function apply() {
     const enabled = (Object.keys(RULES) as RuleKey[]).filter(key => settings.store[key]);
 
     let el = document.getElementById(STYLE_ID);
@@ -62,94 +57,50 @@ const toggle = (displayName: string, description: string, defaultValue = false) 
     onChange: apply,
 });
 
-// Settings UI has no sections, so a heading component stands in for one.
-const section = (title: string) => ({
+const section = (title: string, text: string) => ({
     type: OptionType.COMPONENT as const,
-    component: () => <HeadingSecondary style={{ marginTop: 16 }}>{title}</HeadingSecondary>,
+    component: () => <Section title={title} text={text} />,
 });
 
-// Live counter like uBlock's badge. Sizes are averages, so the data figure is an estimate.
-function BlockedCounter() {
-    const [stats, setStats] = useState(getStats);
-    useEffect(() => {
-        const id = setInterval(() => setStats(getStats()), 1000);
-        return () => clearInterval(id);
-    }, []);
-
-    const sessionCount = stats.rows.reduce((sum, r) => sum + r.session, 0);
-    const totalCount = stats.rows.reduce((sum, r) => sum + r.total, 0);
-
-    return (
-        <div>
-            <HeadingSecondary>Blocked</HeadingSecondary>
-            <Paragraph>
-                This session: {sessionCount} files, about {formatKb(stats.sessionKb)} not downloaded.
-                Since install: {totalCount} files, about {formatKb(stats.totalKb)}.
-            </Paragraph>
-            {stats.rows.filter(r => r.total).map(r => (
-                <Paragraph key={r.key}>{r.label}: {r.session} this session, {r.total} total</Paragraph>
-            ))}
-            <Paragraph>Counts distinct files in Block mode only. Data is estimated from average file sizes.</Paragraph>
-            <Button size="small" variant="secondary" style={{ marginTop: 8 }} onClick={() => { resetStats(); setStats(getStats()); }}>
-                Reset counter
-            </Button>
-        </div>
-    );
-}
-
-// Things Discord or another Vencord plugin already removes: link to them instead of duplicating.
-function HandledElsewhere() {
-    const themesOn = isPluginEnabled("NoProfileThemes");
-    return (
-        <div>
-            <Paragraph>
-                Profile themes (gradient profile backgrounds): Vencord's NoProfileThemes plugin{themesOn ? " is enabled." : " removes them."}
-            </Paragraph>
-            <Button size="small" variant="secondary" style={{ margin: "4px 0 12px" }} onClick={() => openPluginModal(plugins.NoProfileThemes)}>
-                Open NoProfileThemes
-            </Button>
-            <Paragraph>
-                Display name styles (fonts and glow on names) and the GIF, sticker, emoji and apps buttons of the message bar: Discord's own Accessibility settings.
-            </Paragraph>
-            <Button size="small" variant="secondary" style={{ marginTop: 4 }} onClick={() => SettingsRouter.openUserSettings("accessibility_panel")}>
-                Open Accessibility settings
-            </Button>
-        </div>
-    );
-}
-
-const settings = definePluginSettings({
+export const settings = definePluginSettings({
     mode: {
         type: OptionType.SELECT,
         displayName: "Removal mode",
-        description: "Hide: elements are still downloaded, then hidden. Block: like an ad blocker, Discord never fetches what you removed (less bandwidth and CPU). Block applies to options marked (blockable), the rest is hidden.",
+        description: "Hide or Block, picked with the cards below.",
+        // Shown as ModePicker cards instead of a dropdown.
+        hidden: true,
         options: [
             { label: "Hide", value: "hide", default: true },
             { label: "Block", value: "filter" },
         ],
         onChange: apply,
     },
-    blockedCounter: {
+    modePicker: {
         type: OptionType.COMPONENT,
-        component: BlockedCounter,
+        component: ModePicker,
+    },
+    blockedDashboard: {
+        type: OptionType.COMPONENT,
+        component: BlockedDashboard,
     },
     urlBlocking: {
         type: OptionType.BOOLEAN,
         displayName: "Experimental: block by URL",
         description: "In Block mode, also blocks media by URL for options Discord's code cannot be patched for yet. Hooks browser functions, which may look suspicious to Discord's anti-bot checks. Leave off if you get captchas.",
         default: false,
+        hidden: () => !isBlocking(),
         onChange: apply,
     },
 
-    sectionMarketing: section("Marketing"),
+    sectionMarketing: section("Marketing", "Nitro, Shop and gift upsells."),
     hideNitroTab: toggle("Nitro tab", "Removes the Nitro entry at the top of the direct messages list.", true),
     hideShop: toggle("Shop tab", "Removes the Shop entry at the top of the direct messages list.", true),
     hideGiftButton: toggle("Gift button", "Removes the gift icon from the message input bar.", true),
 
-    sectionRecent: section("Recent additions"),
+    sectionRecent: section("Recent additions", "Features added to Discord lately."),
     hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list and the quest icon in member activities."),
 
-    sectionCosmetics: section("Other users' cosmetics"),
+    sectionCosmetics: section("Other users' cosmetics", "Paid decorations other people show on their profile and name."),
     hideAvatarDecorations: toggle("Avatar decorations (blockable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
     hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list. Blocking covers the member list only."),
     freezeAnimations: {
@@ -161,7 +112,7 @@ const settings = definePluginSettings({
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
 
-    sectionElsewhere: section("Handled elsewhere"),
+    sectionElsewhere: section("Handled elsewhere", "Already removable without this plugin."),
     handledElsewhere: {
         type: OptionType.COMPONENT,
         component: HandledElsewhere,

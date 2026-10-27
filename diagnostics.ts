@@ -27,6 +27,8 @@ const KEYWORDS = [
     "banner",
     "upsell",
     "coachmark",
+    // Profile frames (border drawn around a profile popout), a collectible next to profile effects.
+    "frame",
 ] as const;
 
 // Visible texts of popups with no known class: the report lists the classes of their ancestors.

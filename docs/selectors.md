@@ -27,15 +27,15 @@ Patches (no selector):
 | --- | --- | --- |
 | hideAvatarDecorations (Block mode) | `getAvatarDecorationURL` returns nothing, so no request | Same insertion point as Vencord's Decor plugin: incompatible with Decor. Likely working: report of 2026-10-27 12:33 shows no decoration element left in a member list that had 8. |
 | hideClanTags (Block mode) | clan badge URL builder (`find: "/clan-badges/"`) returns nothing | Written from Discord's code in GG's report (module 685073, discord/1.0.9265). Working: report of 2026-10-27 shows badge placeholders and no `clan-badges` media. |
-| hideNameplates (Block mode) | member list rows get `nameplate: undefined` (`find: "onClickPremiumGuildIcon:"`) | Written from Discord's code in GG's report (module 66148, discord/1.0.9265). Member list only. The find matches 2 modules (row component and list), so the patch uses `all: true`; first version without it did not apply. |
+| hideNameplates (Block mode) | member list rows get `nameplate: undefined` (`find: "onClickPremiumGuildIcon:"`) | Written from Discord's code in GG's report (module 66148, discord/1.0.9265). Member list only. The find matches 2 modules (row component and list), so the patch uses `all: true`; first version without it did not apply. Working: report of 2026-10-27 13:20 shows 0 nameplates in a member list, 12 counted as blocked, module 66148 patched. |
 | freezeAnimations | `canAnimate:` -> `!1` (all modules), nameplates `animate`/`loop` -> `!1` | Inverse of Vencord's AlwaysAnimate patches (Vencord 1.15.13, main of 2026-10-24). Not yet tried in GG's client. |
 
 Known but not handled yet:
 
 - Gift button: `[aria-label='Send a gift']` never matched. Needs a report with the button visible, if it still exists.
 - Display name style upsell popup ("Give their style a spin", next to a profile popout): no selector yet. Needs a report taken while it is open (`texts` section).
-- Profile effects (animated overlay on a profile popout, e.g. a candle frame with falling sparkles): no selector or patch yet. No Vencord plugin covers them. Needs a report taken with such a profile open (`keywords.effect`, `media`, `code.profileEffectId`).
-- Display name styles and chat bar GIF/sticker/emoji/apps buttons: not handled here, Discord has its own settings for them (`displayNameStylesEnabled`, `gifButtonEnabled`, `stickerButtonEnabled`, `emojiButtonEnabled`, `appsButtonEnabled` in AccessibilityStore, per Vencord's discord-types). Location in the settings UI not yet confirmed. The plugin's "Open Accessibility settings" button calls `SettingsRouter.openUserSettings("accessibility_panel")`: that panel id is unverified (built from the `<name>_panel` pattern of ids Vencord uses, e.g. `profile_panel`, `sessions_panel`).
+- Profile frames and profile effects: the candle border around a profile popout is most likely a **profile frame**, a collectible next to profile effects (Discord code of 2026-10-27 lists shop tabs `profile_effects`, `nameplates`, `profile_frames` and classes `profileFramePreview`, `profileEffectPreview`). No selector or patch yet, no Vencord plugin covers them. Needs a report taken with such a profile open (`keywords.frame`, `keywords.effect`, `media`).
+- Display name styles and chat bar GIF/sticker/emoji/apps buttons: not handled here, Discord has its own settings for them (`displayNameStylesEnabled`, `gifButtonEnabled`, `stickerButtonEnabled`, `emojiButtonEnabled`, `appsButtonEnabled` in AccessibilityStore, per Vencord's discord-types). The plugin's "Open Accessibility" button calls `SettingsRouter.openUserSettings("accessibility_panel")`, confirmed working by GG on 2026-10-27, and GG confirmed the name styles setting there.
 - Profile themes (gradient profile background): not handled here, Vencord's built-in NoProfileThemes plugin already patches it (`find: "hasThemeColors(){"`).
 
 ## Selector report
@@ -53,7 +53,7 @@ A JSON report is copied to the clipboard (code in `diagnostics.ts`):
 - `code`: snippets of Discord's own code around CDN paths (`clan-badges`, `collectibles-shop`...), used to write Block mode patches.
 - `patches`: how many modules each patch `find` matches (should be 1, unless the patch sets `all`) and which modules carry DiscordClassic patches.
 - `blocked`: the blocked counter (`stats.ts`), per option, with the size estimate used.
-- `media`: every img/video URL on screen, grouped by host and path prefix. Source for URL blocking patterns. `avgKb` is the average downloaded size when the browser exposes it: run the report in Hide mode (blocked files are never downloaded) to correct `ESTIMATED_KB` in `stats.ts`.
+- `media`: every img/video URL on screen, grouped by host and path prefix. Source for URL blocking patterns. `avgKb` is the average downloaded size when the browser exposes it: run the report in Hide mode (blocked files are never downloaded) to correct `ESTIMATED_KB` in `stats.ts`. Report of 2026-10-27 had no `avgKb` at all: Discord's CDN seems to hide sizes from resource timings, so the estimates stay guesses.
 - `keywords`: elements whose class contains a known fragment (`nameplate`, `clan`, `decoration`, `quest`...), with hash suffixes removed, their stable attributes, and the closest ancestor (`anchor`) that has one.
 
 The report can contain usernames (from `aria-label`) and the current channel path.
