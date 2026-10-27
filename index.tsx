@@ -102,7 +102,7 @@ export const settings = definePluginSettings({
     hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list and the quest icon in member activities."),
 
     sectionCosmetics: section("Other users' cosmetics", "Paid decorations other people show on their profile and name.", [
-        "hideAvatarDecorations", "hideNameplates", "hideClanTags", "hideProfileFrames", "freezeAnimations",
+        "hideAvatarDecorations", "hideNameplates", "hideClanTags", "hideProfileFrames", "hideProfileEffects", "freezeAnimations",
     ]),
     hideAvatarDecorations: toggle("Avatar decorations (blockable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
     hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list. Blocking covers the member list only."),
@@ -116,6 +116,7 @@ export const settings = definePluginSettings({
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
     hideProfileFrames: toggle("Profile frames", "Removes the decorative border drawn around some profiles (e.g. candles, dripping wax)."),
+    hideProfileEffects: toggle("Profile effects", "Removes the animated overlay drawn over some profiles (glow, sparkles)."),
 
     sectionElsewhere: section("Handled elsewhere", "Already removable without this plugin."),
     handledElsewhere: {
@@ -140,6 +141,8 @@ const RULES = {
     hideClanTags: "[class*='clanTag'], span[class*='guildTag']",
     // Layer stack drawn over the profile popout, labelled role="img".
     hideProfileFrames: "[class*='profileFrameContainer']",
+    // Overlay layer of the profile popout (role="img"), holds img.effect.
+    hideProfileEffects: "[class*='profileEffects']",
 } satisfies Partial<Record<keyof typeof settings.store, string>>;
 
 type RuleKey = keyof typeof RULES;
