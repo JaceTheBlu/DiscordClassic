@@ -1,5 +1,14 @@
 # DiscordClassic
 
+> [!WARNING]
+> **Use at your own risk.**
+> - Client modifications, including Vencord and this plugin, are against [Discord's Terms of Service](https://discord.com/terms). Your account could be suspended. If it matters a lot to you, do not use client mods.
+> - This plugin only changes what your own client displays or downloads. It sends no extra requests to Discord, automates nothing, and does not unlock paid features.
+> - This is an unofficial, personal project. It is not affiliated with, endorsed by or supported by Discord Inc. or the Vencord project. Do not ask Vencord support for help with it.
+> - Provided as is, without any warranty (see [LICENSE](LICENSE)).
+
+Discord is a trademark of Discord Inc., mentioned only to describe what this plugin works with.
+
 A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord marketing and recent additions to get a "classic" interface back. One plugin, one independent toggle per feature.
 
 > Status: phase 1 (personal userplugin). Most selectors are not validated yet, see [docs/selectors.md](docs/selectors.md).
@@ -65,3 +74,7 @@ pnpm testTsc                                    # typecheck
 The container cannot inject into Discord: run `pnpm inject` from a Vencord checkout on the host to test in the real client. To build against a specific Vencord version, set the `VENCORD_REF` build arg in `.devcontainer/devcontainer.json`.
 
 The plugin sits at the repo root on purpose: Vencord only loads `src/userplugins/<folder>/index.tsx`, one level deep.
+
+## License
+
+[GPL-3.0-or-later](LICENSE), like Vencord. The source file headers follow Vencord's lint rule.
