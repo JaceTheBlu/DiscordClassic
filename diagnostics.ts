@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { search } from "@webpack";
+import { search, wreq } from "@webpack";
+import { getFactoryPatchedBy } from "@webpack/patcher";
 
 // Builds a JSON report of the current DOM to help write and validate selectors.
 // Discovery only: the report lists what exists, it does not pick selectors by itself.
@@ -128,23 +129,41 @@ function scanKeywords() {
     return result;
 }
 
+function mediaGroup(src: string) {
+    let url: URL;
+    try {
+        url = new URL(src);
+    } catch {
+        return;
+    }
+    if (!url.protocol.startsWith("http")) return;
+    const [first = "", second = ""] = url.pathname.split("/").filter(Boolean);
+    return { key: `${url.host}/${first}/${/^\d+$/.test(second) ? "<id>" : second}`, example: url.origin + url.pathname };
+}
+
 // Groups every media URL on the page by host and first two path segments,
 // e.g. "cdn.discordapp.com/avatar-decoration-presets/<id>", to find Filter mode patterns.
+// avgKb comes from the browser's resource timings, used to correct the counter's size estimates.
+// It stays absent when the CDN hides sizes from cross-origin timing.
 function scanMedia() {
-    const groups: Record<string, { count: number; example: string; }> = {};
+    const groups: Record<string, { count: number; example: string; avgKb?: number; sized?: number; }> = {};
     for (const el of document.querySelectorAll("img[src], video[src], source[src]")) {
-        let url: URL;
-        try {
-            url = new URL((el as HTMLImageElement).src);
-        } catch {
-            continue;
-        }
-        if (!url.protocol.startsWith("http")) continue;
-        const [first = "", second = ""] = url.pathname.split("/").filter(Boolean);
-        const key = `${url.host}/${first}/${/^\d+$/.test(second) ? "<id>" : second}`;
-        groups[key] ??= { count: 0, example: url.origin + url.pathname };
-        groups[key].count++;
+        const group = mediaGroup((el as HTMLImageElement).src);
+        if (!group) continue;
+        groups[group.key] ??= { count: 0, example: group.example };
+        groups[group.key].count++;
     }
+
+    const sizes: Record<string, number[]> = {};
+    for (const entry of performance.getEntriesByType("resource") as PerformanceResourceTiming[]) {
+        const group = mediaGroup(entry.name);
+        if (group && groups[group.key] && entry.encodedBodySize > 0) (sizes[group.key] ??= []).push(entry.encodedBodySize);
+    }
+    for (const [key, list] of Object.entries(sizes)) {
+        groups[key].avgKb = Math.round(list.reduce((a, b) => a + b, 0) / list.length / 102.4) / 10;
+        groups[key].sized = list.length;
+    }
+
     return Object.fromEntries(Object.entries(groups).sort((a, b) => b[1].count - a[1].count));
 }
 
@@ -180,7 +199,8 @@ function scanCode() {
 function checkPatches(finds: string[]) {
     return {
         finds: Object.fromEntries(finds.map(find => [find, Object.keys(search(find)).length])),
-        patchedModules: Object.keys(search('Vencord.Plugins.plugins["DiscordClassic"]')),
+        // Factories expose their original source to search(), so ask the patcher instead.
+        patchedModules: Object.keys(wreq.m).filter(id => getFactoryPatchedBy(id)?.has("DiscordClassic")),
     };
 }
 

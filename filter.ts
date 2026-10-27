@@ -10,6 +10,8 @@
 // A main-process webRequest filter was ruled out: Electron allows one onBeforeRequest
 // listener per session, so registering ours could silently replace Discord's.
 
+import { recordBlocked } from "./stats";
+
 type SrcElement = HTMLImageElement | HTMLVideoElement | HTMLSourceElement;
 
 const PROTOS = [HTMLImageElement.prototype, HTMLVideoElement.prototype, HTMLSourceElement.prototype];
@@ -17,14 +19,13 @@ const originalSetAttribute = Element.prototype.setAttribute;
 const originalSrc = new Map<object, PropertyDescriptor>();
 
 let patterns: RegExp[] = [];
-let blockedCount = 0;
 
 const isBlocked = (url: unknown) => typeof url === "string" && patterns.some(p => p.test(url));
 
 function patchedSetAttribute(this: Element, name: string, value: string) {
     const isMedia = this instanceof HTMLImageElement || this instanceof HTMLVideoElement || this instanceof HTMLSourceElement;
     if (name === "src" && isMedia && isBlocked(value)) {
-        blockedCount++;
+        recordBlocked("urlBlocking", value);
         return;
     }
     return originalSetAttribute.call(this, name, value);
@@ -34,10 +35,6 @@ export function setFilterPatterns(next: RegExp[]) {
     patterns = next;
     if (patterns.length) installFilter();
     else uninstallFilter();
-}
-
-export function getBlockedCount() {
-    return blockedCount;
 }
 
 function installFilter() {
@@ -52,7 +49,7 @@ function installFilter() {
             ...desc,
             set(this: SrcElement, value: string) {
                 if (isBlocked(value)) {
-                    blockedCount++;
+                    recordBlocked("urlBlocking", value);
                     return;
                 }
                 desc.set!.call(this, value);

@@ -26,8 +26,8 @@ Patches (no selector):
 | Option | Patch | Status |
 | --- | --- | --- |
 | hideAvatarDecorations (Block mode) | `getAvatarDecorationURL` returns nothing, so no request | Same insertion point as Vencord's Decor plugin: incompatible with Decor. Likely working: report of 2026-10-27 12:33 shows no decoration element left in a member list that had 8. |
-| hideClanTags (Block mode) | clan badge URL builder (`find: "/clan-badges/"`) returns nothing | Written from Discord's code in GG's report (module 685073, discord/1.0.9265). Not yet tried. |
-| hideNameplates (Block mode) | member list rows get `nameplate: undefined` (`find: "onClickPremiumGuildIcon:"`) | Written from Discord's code in GG's report (module 66148, discord/1.0.9265). Member list only. Not yet tried. |
+| hideClanTags (Block mode) | clan badge URL builder (`find: "/clan-badges/"`) returns nothing | Written from Discord's code in GG's report (module 685073, discord/1.0.9265). Working: report of 2026-10-27 shows badge placeholders and no `clan-badges` media. |
+| hideNameplates (Block mode) | member list rows get `nameplate: undefined` (`find: "onClickPremiumGuildIcon:"`) | Written from Discord's code in GG's report (module 66148, discord/1.0.9265). Member list only. The find matches 2 modules (row component and list), so the patch uses `all: true`; first version without it did not apply. |
 | freezeAnimations | `canAnimate:` -> `!1` (all modules), nameplates `animate`/`loop` -> `!1` | Inverse of Vencord's AlwaysAnimate patches (Vencord 1.15.13, main of 2026-10-24). Not yet tried in GG's client. |
 
 Known but not handled yet:
@@ -46,8 +46,9 @@ A JSON report is copied to the clipboard (code in `diagnostics.ts`):
 - `rules`: for each `RULES` entry, how many elements it matches right now, and a sample. `count: 0` means the selector is wrong or the element is not on screen.
 - `buttons`: distinct `aria-label`s of buttons on screen (chat bar, toolbars).
 - `code`: snippets of Discord's own code around CDN paths (`clan-badges`, `collectibles-shop`...), used to write Block mode patches.
-- `patches`: how many modules each patch `find` matches (should be 1) and which modules carry DiscordClassic patches.
-- `media`: every img/video URL on screen, grouped by host and path prefix. Source for URL blocking patterns.
+- `patches`: how many modules each patch `find` matches (should be 1, unless the patch sets `all`) and which modules carry DiscordClassic patches.
+- `blocked`: the blocked counter (`stats.ts`), per option, with the size estimate used.
+- `media`: every img/video URL on screen, grouped by host and path prefix. Source for URL blocking patterns. `avgKb` is the average downloaded size when the browser exposes it: run the report in Hide mode (blocked files are never downloaded) to correct `ESTIMATED_KB` in `stats.ts`.
 - `keywords`: elements whose class contains a known fragment (`nameplate`, `clan`, `decoration`, `quest`...), with hash suffixes removed, their stable attributes, and the closest ancestor (`anchor`) that has one.
 
 The report can contain usernames (from `aria-label`) and the current channel path.
