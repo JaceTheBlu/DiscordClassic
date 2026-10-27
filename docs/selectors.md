@@ -13,6 +13,7 @@ Status of each `RULES` entry in `index.tsx`. "verified" means the selector repor
 | hideAvatarDecorations | `img[class*='avatarDecoration']` | verified, class based | 2026-10-27, discord/1.0.9265 |
 | hideNameplates | `[class*='nameplated'] > [class*='container']:first-child` | verified, class based (first child of the `nameplated` row holds the background img) | 2026-10-27, discord/1.0.9265 |
 | hideProfileFrames | `[class*='profileFrameContainer']` | verified, class based (`div.profileFrameContainer.custom-profile-frame`, role img, holds the frame layers; images from `collectibles-shop`) | 2026-10-27, discord/1.0.9265 |
+| hideProfileEffects | `[class*='profileEffects']` | verified, class based (`div.profileEffects`, role img, holds `img.effect` from `cdn.discordapp.com/assets/content/<hash>`). No `FILTERS` entry: `assets/content` may serve other content too | 2026-10-27, discord/1.0.9265 |
 | hideClanTags | `[class*='clanTag'], span[class*='guildTag']` | verified, class based (`clanTag` in DMs, `guildTag` in member list) | 2026-10-27, discord/1.0.9265 |
 
 URL blocking patterns, experimental (seen in reports, 2026-10-27, discord/1.0.9265):
@@ -35,7 +36,7 @@ Known but not handled yet:
 
 - Gift button: `[aria-label='Send a gift']` never matched. Needs a report with the button visible, if it still exists.
 - Display name style upsell popup ("Give their style a spin", next to a profile popout): no selector yet. Needs a report taken while it is open (`texts` section).
-- Profile effects (animated overlay, e.g. falling sparkles): not seen in a report yet. Profile frames are handled (`hideProfileFrames`), CSS only: no patch yet, the report now searches Discord code for `custom-profile-frame`.
+- Profile effects: handled (`hideProfileEffects`), CSS only, no patch yet. Profile frames are handled (`hideProfileFrames`), CSS only: no patch yet, the report now searches Discord code for `custom-profile-frame`.
 - Display name styles and chat bar GIF/sticker/emoji/apps buttons: not handled here, Discord has its own settings for them (`displayNameStylesEnabled`, `gifButtonEnabled`, `stickerButtonEnabled`, `emojiButtonEnabled`, `appsButtonEnabled` in AccessibilityStore, per Vencord's discord-types). The plugin's "Open Accessibility" button calls `SettingsRouter.openUserSettings("accessibility_panel")`, confirmed working by GG on 2026-10-27, and GG confirmed the name styles setting there.
 - Profile themes (gradient profile background): not handled here, Vencord's built-in NoProfileThemes plugin already patches it (`find: "hasThemeColors(){"`).
 
