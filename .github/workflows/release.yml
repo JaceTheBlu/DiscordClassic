@@ -1,0 +1,77 @@
+# Builds Vencord with this plugin and publishes it as the "latest" release.
+# install.ps1 downloads these files, and Vencord's own updater reads this release:
+# VENCORD_REMOTE points the updater at this repo, the release name ends with the plugin commit hash.
+name: Release build
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+    # Picks up Vencord fixes for Discord updates even when the plugin did not change.
+    schedule:
+        - cron: "0 6 * * 1"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+concurrency:
+    group: release-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    FORCE_COLOR: true
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Vencord
+              uses: actions/checkout@v7
+              with:
+                  repository: Vendicated/Vencord
+
+            - name: Checkout DiscordClassic
+              uses: actions/checkout@v7
+              with:
+                  path: src/userplugins/DiscordClassic
+                  fetch-depth: 0
+
+            - uses: pnpm/action-setup@v6
+
+            - uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Set build identity
+              run: |
+                  # Short hash of the plugin commit: the updater compares it with the release name.
+                  echo "VENCORD_HASH=$(git -C src/userplugins/DiscordClassic rev-parse --short=7 HEAD)" >> "$GITHUB_ENV"
+                  echo "VENCORD_REMOTE=${{ github.repository }}" >> "$GITHUB_ENV"
+
+            - name: Build
+              run: pnpm build --standalone
+
+            - name: Check the plugin is in the build
+              run: grep -q '"DiscordClassic"' dist/renderer.js
+
+            - name: Publish release
+              if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  GH_REPO: ${{ github.repository }}
+              run: |
+                  # Same files as Vencord's own releases, with their source maps.
+                  files=$(ls dist/patcher.js* dist/preload.js* dist/renderer.js* dist/renderer.css*)
+                  title="DiscordClassic $VENCORD_HASH"
+                  notes="Vencord $(git rev-parse --short HEAD) with DiscordClassic $VENCORD_HASH. Install or update: see the README."
+                  if gh release view latest > /dev/null 2>&1; then
+                      gh release upload latest $files --clobber
+                      gh release edit latest --title "$title" --notes "$notes" --latest
+                  else
+                      gh release create latest $files --title "$title" --notes "$notes" --target "${{ github.sha }}" --latest
+                  fi
