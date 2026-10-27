@@ -25,10 +25,13 @@ function apply() {
     }
     el.textContent = enabled.map(key => `${RULES[key]} { display: none !important; }`).join("\n");
 
-    setFilterPatterns(settings.store.mode === "filter"
+    setFilterPatterns(isBlocking() && settings.store.urlBlocking
         ? enabled.flatMap(key => FILTERS[key] ?? [])
         : []);
 }
+
+// "filter" is the stored value of Block mode, kept for existing installs.
+const isBlocking = () => settings.store.mode === "filter";
 
 function stop() {
     document.getElementById(STYLE_ID)?.remove();
@@ -60,11 +63,18 @@ const settings = definePluginSettings({
     mode: {
         type: OptionType.SELECT,
         displayName: "Removal mode",
-        description: "Hide: the element is still downloaded, then hidden. Filter: cosmetic images and animations are not downloaded at all (less bandwidth and CPU), then hidden. Filter only affects options marked (filterable).",
+        description: "Hide: elements are still downloaded, then hidden. Block: like an ad blocker, Discord never fetches what you removed (less bandwidth and CPU). Block applies to options marked (blockable), the rest is hidden.",
         options: [
             { label: "Hide", value: "hide", default: true },
-            { label: "Filter", value: "filter" },
+            { label: "Block", value: "filter" },
         ],
+        onChange: apply,
+    },
+    urlBlocking: {
+        type: OptionType.BOOLEAN,
+        displayName: "Experimental: block by URL",
+        description: "In Block mode, also blocks media by URL for options Discord's code cannot be patched for yet. Hooks browser functions, which may look suspicious to Discord's anti-bot checks. Leave off if you get captchas.",
+        default: false,
         onChange: apply,
     },
 
@@ -77,9 +87,16 @@ const settings = definePluginSettings({
     hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list and the quest icon in member activities."),
 
     sectionCosmetics: section("Other users' cosmetics"),
-    hideAvatarDecorations: toggle("Avatar decorations (filterable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
-    hideNameplates: toggle("Nameplates (filterable)", "Removes the image or animation drawn behind some usernames in the member list."),
-    hideClanTags: toggle("Server tags (filterable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
+    hideAvatarDecorations: toggle("Avatar decorations (blockable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
+    hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list."),
+    freezeAnimations: {
+        type: OptionType.BOOLEAN,
+        displayName: "Freeze animations",
+        description: "Shows animated avatars, banners, avatar decorations and nameplates as still images. Needs a restart. Do not combine with the AlwaysAnimate plugin.",
+        default: false,
+        restartNeeded: true,
+    },
+    hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
 });
 
 // Validation status of each selector lives in docs/selectors.md: Discord changes its markup every build.
@@ -100,7 +117,7 @@ const RULES = {
 
 type RuleKey = keyof typeof RULES;
 
-// Media URL patterns blocked in Filter mode, only from URLs seen in a selector report
+// Media URL patterns for experimental URL blocking, only from URLs seen in a selector report
 // ("media" section and "src" fields). Never add a guessed pattern.
 // Decorations, nameplates and Shop previews share one CDN prefix: filtering one blocks them all.
 const COLLECTIBLES = /^https:\/\/cdn\.discordapp\.com\/media\/v1\/collectibles-shop\//;
@@ -117,10 +134,44 @@ export default definePlugin({
     // TODO: replace 0n with your Discord user ID. Move to Devs in src/utils/constants.ts for the upstream PR.
     authors: [{ name: "JaceTheBlu", id: 0n }],
     settings,
+    // Match strings come from Vencord plugins that track Discord's current code (see docs/selectors.md).
+    patches: [
+        {
+            // Block mode: no decoration URL means no download. Same insertion point as Vencord's Decor plugin.
+            find: "getAvatarDecorationURL:",
+            replacement: {
+                match: /(?<=function \i\(\i\){)(?=let{avatarDecoration)/,
+                replace: "if($self.blocks(\"hideAvatarDecorations\"))return;",
+            },
+        },
+        // Freeze animations: inverse of Vencord's AlwaysAnimate patches.
+        {
+            // Avatars, banners and decorations
+            find: "canAnimate:",
+            all: true,
+            noWarn: true,
+            predicate: () => settings.store.freezeAnimations,
+            replacement: {
+                match: /canAnimate:.+?([,}].*?\))/g,
+                // Leave destructuring patterns ("{canAnimate:x}=props") alone.
+                replace: (m, rest) => /}=.+/.test(rest) ? m : `canAnimate:!1${rest}`,
+            },
+        },
+        {
+            // Nameplates
+            find: ".MINI_PREVIEW,[",
+            predicate: () => settings.store.freezeAnimations,
+            replacement: {
+                match: /animate:\i,loop:/,
+                replace: "animate:!1,loop:!1,_loop:",
+            },
+        },
+    ],
     toolboxActions: {
         "Copy selector report": copySelectorReport,
     },
     copySelectorReport,
+    blocks: (key: RuleKey) => isBlocking() && settings.store[key],
     start: apply,
     stop,
 });

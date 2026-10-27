@@ -14,12 +14,19 @@ Status of each `RULES` entry in `index.tsx`. "verified" means the selector repor
 | hideNameplates | `[class*='nameplated'] > [class*='container']:first-child` | verified, class based (first child of the `nameplated` row holds the background img) | 2026-10-27, discord/1.0.9265 |
 | hideClanTags | `[class*='clanTag'], span[class*='guildTag']` | verified, class based (`clanTag` in DMs, `guildTag` in member list) | 2026-10-27, discord/1.0.9265 |
 
-Filter mode patterns (seen in reports, 2026-10-27, discord/1.0.9265):
+URL blocking patterns, experimental (seen in reports, 2026-10-27, discord/1.0.9265):
 
 | Option | URL prefix |
 | --- | --- |
 | hideAvatarDecorations, hideNameplates | `https://cdn.discordapp.com/media/v1/collectibles-shop/` (shared, also used by Shop previews: filtering one blocks all) |
 | hideClanTags | `https://cdn.discordapp.com/clan-badges/` |
+
+Patches (no selector):
+
+| Option | Patch | Status |
+| --- | --- | --- |
+| hideAvatarDecorations (Block mode) | `getAvatarDecorationURL` returns nothing, so no request | Same insertion point as Vencord's Decor plugin: incompatible with Decor. Not yet tried in GG's client. |
+| freezeAnimations | `canAnimate:` -> `!1` (all modules), nameplates `animate`/`loop` -> `!1` | Inverse of Vencord's AlwaysAnimate patches (Vencord 1.15.13, main of 2026-10-24). Not yet tried in GG's client. |
 
 Known but not handled yet:
 
@@ -35,7 +42,9 @@ The plugin can scan the page for you. Open the view to check (for example a serv
 A JSON report is copied to the clipboard (code in `diagnostics.ts`):
 
 - `rules`: for each `RULES` entry, how many elements it matches right now, and a sample. `count: 0` means the selector is wrong or the element is not on screen.
-- `media`: every img/video URL on screen, grouped by host and path prefix. Source for Filter mode patterns.
+- `buttons`: distinct `aria-label`s of buttons on screen (chat bar, toolbars).
+- `code`: snippets of Discord's own code around CDN paths (`clan-badges`, `collectibles-shop`...), used to write Block mode patches.
+- `media`: every img/video URL on screen, grouped by host and path prefix. Source for URL blocking patterns.
 - `keywords`: elements whose class contains a known fragment (`nameplate`, `clan`, `decoration`, `quest`...), with hash suffixes removed, their stable attributes, and the closest ancestor (`anchor`) that has one.
 
 The report can contain usernames (from `aria-label`) and the current channel path.

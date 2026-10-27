@@ -9,7 +9,7 @@
 
 Discord is a trademark of Discord Inc., mentioned only to describe what this plugin works with.
 
-A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord marketing and recent additions to get a "classic" interface back. One plugin, one independent toggle per feature.
+A [Vencord](https://github.com/Vendicated/Vencord) userplugin that blocks or hides Discord marketing and recent additions to get a "classic" interface back. One plugin, one independent toggle per feature.
 
 > Status: phase 1 (personal userplugin). Selector validation status: [docs/selectors.md](docs/selectors.md).
 
@@ -17,7 +17,7 @@ A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord
 
 Settings are grouped by zone, each with a short explanation in the Vencord settings.
 
-**Removal mode**: *Hide* (default) hides elements with CSS, they are still downloaded. *Filter* also stops cosmetic images and animations from being downloaded, for options marked "(filterable)". Filter patterns are added only once confirmed from a selector report.
+**Removal mode**: *Hide* (default) hides elements with CSS, Discord still downloads them. *Block* works like an ad blocker: for options marked "(blockable)", Discord's code is patched so the content is never fetched, and the rest is hidden. *Experimental: block by URL* extends Block to options with no patch yet, by hooking browser functions; it may trigger Discord's anti-bot captchas, keep it off unless you need it.
 
 | Zone | Option | Default |
 | --- | --- | --- |
@@ -25,11 +25,12 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Marketing | Shop tab | on |
 | Marketing | Gift button | on |
 | Recent additions | Quests | off |
-| Other users' cosmetics | Avatar decorations (filterable) | off |
-| Other users' cosmetics | Nameplates (filterable) | off |
-| Other users' cosmetics | Server tags (filterable) | off |
+| Other users' cosmetics | Avatar decorations (blockable) | off |
+| Other users' cosmetics | Nameplates (blockable) | off |
+| Other users' cosmetics | Server tags (blockable) | off |
+| Other users' cosmetics | Freeze animations (patch, restart needed) | off |
 
-Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).
+Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 
 ## Selector report
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { search } from "@webpack";
+
 // Builds a JSON report of the current DOM to help write and validate selectors.
 // Discovery only: the report lists what exists, it does not pick selectors by itself.
 
@@ -21,6 +23,7 @@ const KEYWORDS = [
     "gift",
     // "orb" alone also matches "colorBrand" and "indicatorBottom".
     "orbs",
+    "banner",
 ] as const;
 
 const STABLE_ATTRS = ["data-list-item-id", "aria-label", "href", "role", "data-tab-id"];
@@ -145,6 +148,34 @@ function scanMedia() {
     return Object.fromEntries(Object.entries(groups).sort((a, b) => b[1].count - a[1].count));
 }
 
+// Distinct button labels, to find chat bar and toolbar buttons by aria-label.
+function scanButtonLabels() {
+    const labels = new Set<string>();
+    for (const el of document.querySelectorAll("button[aria-label], [role='button'][aria-label]")) {
+        labels.add(el.getAttribute("aria-label")!.slice(0, 80));
+        if (labels.size >= 150) break;
+    }
+    return [...labels];
+}
+
+// Code around CDN paths in Discord's webpack modules, to write Block mode patches from real code.
+const CODE_NEEDLES = ["clan-badges", "collectibles-shop", "nameplate", "quests/@me"];
+
+function scanCode() {
+    const result: Record<string, { module: string; snippets: string[]; }[]> = {};
+    for (const needle of CODE_NEEDLES) {
+        const modules = Object.entries(search(needle)).slice(0, 5);
+        result[needle] = modules.map(([id, factory]) => {
+            const src = factory.toString();
+            const snippets: string[] = [];
+            for (let i = src.indexOf(needle); i !== -1 && snippets.length < 3; i = src.indexOf(needle, i + 1))
+                snippets.push(src.slice(Math.max(0, i - 200), i + 200));
+            return { module: id, snippets };
+        });
+    }
+    return result;
+}
+
 export function buildReport(rules: Record<string, string>, enabled: Record<string, unknown>) {
     return {
         date: new Date().toISOString(),
@@ -158,5 +189,7 @@ export function buildReport(rules: Record<string, string>, enabled: Record<strin
         ),
         keywords: scanKeywords(),
         media: scanMedia(),
+        buttons: scanButtonLabels(),
+        code: scanCode(),
     };
 }
