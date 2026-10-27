@@ -10,6 +10,7 @@ import "./style.css";
 
 import { isPluginEnabled, plugins } from "@api/PluginManager";
 import { Button } from "@components/Button";
+import { FormSwitch } from "@components/FormSwitch";
 import { HeadingSecondary } from "@components/Heading";
 import { Paragraph } from "@components/Paragraph";
 import { openPluginModal } from "@components/settings";
@@ -115,12 +116,52 @@ export function BlockedDashboard() {
     );
 }
 
-// Settings UI has no sections, so a heading with a one-line summary stands in for one.
-export function Section({ title, text }: { title: string; text: string; }) {
+type SettingKey = keyof typeof settings.store;
+
+// Settings UI has no sections, so this component draws one: heading, summary, All / None,
+// and the section's own toggles (hidden from Vencord's list so they can be refreshed together).
+export function Section({ title, text, keys }: { title: string; text: string; keys: string[]; }) {
+    const store = settings.use(keys as SettingKey[]);
+    const [restart, setRestart] = useState(false);
+
+    const defs = keys.map(key => ({ key: key as SettingKey, def: settings.def[key as SettingKey] as { displayName?: string; description: string; restartNeeded?: boolean; } }));
+    // Restart-only options stay out of All / None, so a bulk change never asks for a restart.
+    const bulk = defs.filter(d => !d.def.restartNeeded);
+    const setAll = (value: boolean) => {
+        for (const { key } of bulk) (settings.store as Record<string, unknown>)[key] = value;
+        apply();
+    };
+    const allOn = bulk.every(({ key }) => store[key]);
+    const allOff = bulk.every(({ key }) => !store[key]);
+
     return (
         <div className={cl("section")}>
-            <HeadingSecondary>{title}</HeadingSecondary>
-            <Paragraph className={cl("muted")}>{text}</Paragraph>
+            <div className={cl("section-head")}>
+                <div>
+                    <HeadingSecondary>{title}</HeadingSecondary>
+                    <Paragraph className={cl("muted")}>{text}</Paragraph>
+                </div>
+                {bulk.length > 1 && (
+                    <div className={cl("segmented")}>
+                        <button className={classes(cl("segment"), allOn && cl("segment-active"))} onClick={() => setAll(true)}>All</button>
+                        <button className={classes(cl("segment"), allOff && cl("segment-active"))} onClick={() => setAll(false)}>None</button>
+                    </div>
+                )}
+            </div>
+            {defs.map(({ key, def }) => (
+                <FormSwitch
+                    key={key}
+                    title={def.displayName ?? key}
+                    description={def.description}
+                    value={Boolean(store[key])}
+                    onChange={value => {
+                        (settings.store as Record<string, unknown>)[key] = value;
+                        if (def.restartNeeded) setRestart(true);
+                        else apply();
+                    }}
+                />
+            ))}
+            {restart && <Paragraph className={cl("restart")}>Restart Discord to apply this change.</Paragraph>}
         </div>
     );
 }

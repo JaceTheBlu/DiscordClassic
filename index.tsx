@@ -48,18 +48,19 @@ function copySelectorReport() {
     copyWithToast(JSON.stringify(report, null, 2), "DiscordClassic: selector report copied");
 }
 
-// Every option re-applies on change, so toggles take effect live without a restart.
+// Toggles are drawn by their Section (with All / None), so Vencord's own row is hidden.
+// Section calls apply() itself: toggles take effect live without a restart.
 const toggle = (displayName: string, description: string, defaultValue = false) => ({
     type: OptionType.BOOLEAN as const,
     displayName,
     description,
     default: defaultValue,
-    onChange: apply,
+    hidden: true,
 });
 
-const section = (title: string, text: string) => ({
+const section = (title: string, text: string, keys: string[] = []) => ({
     type: OptionType.COMPONENT as const,
-    component: () => <Section title={title} text={text} />,
+    component: () => <Section title={title} text={text} keys={keys} />,
 });
 
 export const settings = definePluginSettings({
@@ -92,15 +93,17 @@ export const settings = definePluginSettings({
         onChange: apply,
     },
 
-    sectionMarketing: section("Marketing", "Nitro, Shop and gift upsells."),
+    sectionMarketing: section("Marketing", "Nitro, Shop and gift upsells.", ["hideNitroTab", "hideShop", "hideGiftButton"]),
     hideNitroTab: toggle("Nitro tab", "Removes the Nitro entry at the top of the direct messages list.", true),
     hideShop: toggle("Shop tab", "Removes the Shop entry at the top of the direct messages list.", true),
     hideGiftButton: toggle("Gift button", "Removes the gift icon from the message input bar.", true),
 
-    sectionRecent: section("Recent additions", "Features added to Discord lately."),
+    sectionRecent: section("Recent additions", "Features added to Discord lately.", ["hideQuests"]),
     hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list and the quest icon in member activities."),
 
-    sectionCosmetics: section("Other users' cosmetics", "Paid decorations other people show on their profile and name."),
+    sectionCosmetics: section("Other users' cosmetics", "Paid decorations other people show on their profile and name.", [
+        "hideAvatarDecorations", "hideNameplates", "hideClanTags", "hideProfileFrames", "freezeAnimations",
+    ]),
     hideAvatarDecorations: toggle("Avatar decorations (blockable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
     hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list. Blocking covers the member list only."),
     freezeAnimations: {
@@ -109,6 +112,7 @@ export const settings = definePluginSettings({
         description: "Shows animated avatars, banners, avatar decorations and nameplates as still images. Needs a restart. Do not combine with the AlwaysAnimate plugin.",
         default: false,
         restartNeeded: true,
+        hidden: true,
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
     hideProfileFrames: toggle("Profile frames", "Removes the decorative border drawn around some profiles (e.g. candles, dripping wax)."),
