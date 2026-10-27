@@ -19,7 +19,7 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 
 **Removal mode**: *Hide* (default) hides elements with CSS, Discord still downloads them. *Block* works like an ad blocker: for options marked "(blockable)", Discord's code is patched so the content is never fetched, and the rest is hidden. *Experimental: block by URL* extends Block to options with no patch yet, by hooking browser functions; it may trigger Discord's anti-bot captchas, keep it off unless you need it.
 
-**Blocked counter**: like uBlock Origin's badge, the settings page shows how many files Block mode kept Discord from downloading, this session and since install, with an estimate of the data saved. Each file counts once per session. The data figure uses average file sizes, so treat it as an order of magnitude. Time saved is not measured.
+**Blocked counter**: like uBlock Origin's badge, the top of the settings page shows a dashboard of what Block mode kept Discord from downloading: files, estimated data saved, and one bar per option, for this session or since install. Each file counts once per session. The data figure uses average file sizes, so treat it as an order of magnitude. Time saved is not measured.
 
 | Zone | Option | Default |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoPro
 
 Discord itself can turn off some of these, no plugin needed (setting names from Vencord's typings of Discord's AccessibilityStore, look under User Settings > Accessibility): display name styles (fonts and glow on names), and the GIF, sticker, emoji and apps buttons of the chat bar.
 
-The plugin settings have a **Handled elsewhere** section with buttons to both.
+The plugin settings have a **Handled elsewhere** section with buttons to both. The removal mode is picked with two cards at the top, and "Experimental: block by URL" only shows in Block mode.
 
 Planned: profile effects, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 

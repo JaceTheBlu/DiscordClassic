@@ -7,6 +7,7 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 - `index.tsx`: settings (grouped by zone with `section(...)` heading components, `mode` = hide/block, `urlBlocking`), `RULES` (toggle -> CSS selector), `FILTERS` (toggle -> media URL regexes for experimental URL blocking), `apply()` re-run on every setting change, `patches` for options that need Discord's code changed (`freezeAnimations`, `restartNeeded`).
 - Block mode (`mode` value `"filter"`, kept for stored settings): patches first (`$self.blocks(key)`), `filter.ts` only behind the `urlBlocking` toggle.
 - `filter.ts`: experimental URL blocking. Intercepts `src` on img/video/source in the renderer so matching media is never requested. Not a main-process webRequest listener on purpose (Electron allows one per session).
+- `ui.tsx` + `style.css`: settings page components (mode cards, blocked dashboard, section headings, Handled elsewhere). Colors only from Discord theme variables.
 - `stats.ts`: uBlock-style blocked counter. `$self.blocks(key, item)` records each distinct item once per session, totals persist in DataStore. Sizes in `ESTIMATED_KB` are estimates, correct them from the report `media` `avgKb`.
 - `diagnostics.ts`: `buildReport` scans the DOM for selector discovery, exposed as the **Copy selector report** toolbox action. Discovery only, it never picks selectors.
 - `docs/selectors.md`: selector validation status and DevTools procedure. Read it before touching `RULES`.
