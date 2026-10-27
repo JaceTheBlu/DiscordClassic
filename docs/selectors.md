@@ -33,6 +33,8 @@ Patches (no selector):
 Known but not handled yet:
 
 - Gift button: `[aria-label='Send a gift']` never matched. Needs a report with the button visible, if it still exists.
+- Display name style upsell popup ("Give their style a spin", next to a profile popout): no selector yet. Needs a report taken while it is open (`texts` section).
+- Profile themes (gradient profile background): not handled here, Vencord's built-in NoProfileThemes plugin already patches it (`find: "hasThemeColors(){"`).
 
 ## Selector report
 
@@ -44,6 +46,7 @@ The plugin can scan the page for you. Open the view to check (for example a serv
 A JSON report is copied to the clipboard (code in `diagnostics.ts`):
 
 - `rules`: for each `RULES` entry, how many elements it matches right now, and a sample. `count: 0` means the selector is wrong or the element is not on screen.
+- `texts`: for each phrase in `TEXTS`, the classes of up to 8 ancestors of every element showing it. For popups with no telling class.
 - `buttons`: distinct `aria-label`s of buttons on screen (chat bar, toolbars).
 - `code`: snippets of Discord's own code around CDN paths (`clan-badges`, `collectibles-shop`...), used to write Block mode patches.
 - `patches`: how many modules each patch `find` matches (should be 1, unless the patch sets `all`) and which modules carry DiscordClassic patches.

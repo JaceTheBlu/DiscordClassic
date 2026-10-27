@@ -32,7 +32,9 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Other users' cosmetics | Server tags (blockable) | off |
 | Other users' cosmetics | Freeze animations (patch, restart needed) | off |
 
-Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
+Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoProfileThemes** plugin.
+
+Planned: profile effects, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 
 ## Selector report
 
