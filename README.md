@@ -30,6 +30,7 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Other users' cosmetics | Avatar decorations (blockable) | off |
 | Other users' cosmetics | Nameplates (blockable) | off |
 | Other users' cosmetics | Server tags (blockable) | off |
+| Other users' cosmetics | Profile frames (blocked only with "block by URL") | off |
 | Other users' cosmetics | Freeze animations (patch, restart needed) | off |
 
 Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoProfileThemes** plugin.
