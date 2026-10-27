@@ -176,7 +176,15 @@ function scanCode() {
     return result;
 }
 
-export function buildReport(rules: Record<string, string>, enabled: Record<string, unknown>) {
+// Whether each patch "find" still hits exactly one module, and which modules carry our patches.
+function checkPatches(finds: string[]) {
+    return {
+        finds: Object.fromEntries(finds.map(find => [find, Object.keys(search(find)).length])),
+        patchedModules: Object.keys(search('Vencord.Plugins.plugins["DiscordClassic"]')),
+    };
+}
+
+export function buildReport(rules: Record<string, string>, enabled: Record<string, unknown>, finds: string[]) {
     return {
         date: new Date().toISOString(),
         userAgent: navigator.userAgent,
@@ -191,5 +199,6 @@ export function buildReport(rules: Record<string, string>, enabled: Record<strin
         media: scanMedia(),
         buttons: scanButtonLabels(),
         code: scanCode(),
+        patches: checkPatches(finds),
     };
 }

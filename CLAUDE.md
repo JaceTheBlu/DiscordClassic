@@ -19,7 +19,7 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 - Never claim a Discord selector or module name is correct without checking it in DevTools: they change every build. Mark unverified ones as such.
 - Prefer stable attributes (`data-list-item-id`, `href`, `aria-label`). When none exists, `[class*='readablePrefix']`, never a full hashed class.
 - Adding an option = one `toggle(displayName, description)` under the right `section` + one entry in `RULES` (+ `FILTERS` if it loads media) + one row in `docs/selectors.md` and in the README table.
-- Patches: only from a match string proven in current Vencord code (e.g. an existing plugin's patch), never written blind against Discord's bundle.
+- Patches: only from a match string proven in current Vencord code (e.g. an existing plugin's patch) or in Discord code captured by a selector report (`code` section), never written blind. Check the report's `patches` section after a Discord update.
 - `FILTERS` patterns only from URLs seen in a selector report `media` section, never guessed.
 - Defaults: off, except obvious marketing (Nitro, Shop, gift).
 - Phase 2 (upstream PR to `Vendicated/Vencord`): replace key CSS rules with patches, move author to `Devs`, run `pnpm lint`.
