@@ -6,14 +6,18 @@ A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord
 
 ## Options
 
-| Option | Default | Method |
+Settings are grouped by zone, each with a short explanation in the Vencord settings.
+
+**Removal mode**: *Hide* (default) hides elements with CSS, they are still downloaded. *Filter* also stops cosmetic images and animations from being downloaded, for options marked "(filterable)". Filter patterns are added only once confirmed from a selector report, so for now Filter behaves like Hide.
+
+| Zone | Option | Default |
 | --- | --- | --- |
-| Hide Nitro tab | on | CSS |
-| Hide Shop tab | on | CSS |
-| Hide gift button | on | CSS |
-| Hide Quests | off | CSS |
-| Hide avatar decorations | off | CSS |
-| Hide server tags | off | CSS |
+| Marketing | Nitro tab | on |
+| Marketing | Shop tab | on |
+| Marketing | Gift button | on |
+| Recent additions | Quests | off |
+| Other users' cosmetics | Avatar decorations (filterable) | off |
+| Other users' cosmetics | Server tags | off |
 
 Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).
 
