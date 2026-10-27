@@ -30,8 +30,8 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Other users' cosmetics | Avatar decorations (blockable) | off |
 | Other users' cosmetics | Nameplates (blockable) | off |
 | Other users' cosmetics | Server tags (blockable) | off |
-| Other users' cosmetics | Profile frames (blocked only with "block by URL") | off |
-| Other users' cosmetics | Profile effects | off |
+| Other users' cosmetics | Profile frames (blockable) | off |
+| Other users' cosmetics | Profile effects (blockable) | off |
 | Other users' cosmetics | Freeze animations (patch, restart needed) | off |
 
 Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoProfileThemes** plugin.
@@ -40,7 +40,7 @@ Discord itself can turn off some of these, no plugin needed (setting names from 
 
 The plugin settings have a **Handled elsewhere** section with buttons to both. Each zone has All / None buttons (Freeze animations is left out, it needs a restart). The removal mode is picked with two cards at the top, and "Experimental: block by URL" only shows in Block mode.
 
-Planned: profile effects, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
+Planned: orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 
 ## Selector report
 
