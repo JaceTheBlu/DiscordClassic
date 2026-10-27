@@ -111,6 +111,7 @@ export const settings = definePluginSettings({
         restartNeeded: true,
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
+    hideProfileFrames: toggle("Profile frames", "Removes the decorative border drawn around some profiles (e.g. candles, dripping wax)."),
 
     sectionElsewhere: section("Handled elsewhere", "Already removable without this plugin."),
     handledElsewhere: {
@@ -133,6 +134,8 @@ const RULES = {
     hideNameplates: "[class*='nameplated'] > [class*='container']:first-child",
     // DM list and member list use different class names for the same chip.
     hideClanTags: "[class*='clanTag'], span[class*='guildTag']",
+    // Layer stack drawn over the profile popout, labelled role="img".
+    hideProfileFrames: "[class*='profileFrameContainer']",
 } satisfies Partial<Record<keyof typeof settings.store, string>>;
 
 type RuleKey = keyof typeof RULES;
@@ -146,6 +149,7 @@ const FILTERS: Partial<Record<RuleKey, RegExp[]>> = {
     hideAvatarDecorations: [COLLECTIBLES],
     hideNameplates: [COLLECTIBLES],
     hideClanTags: [/^https:\/\/cdn\.discordapp\.com\/clan-badges\//],
+    hideProfileFrames: [COLLECTIBLES],
 };
 
 const plugin = definePlugin({
