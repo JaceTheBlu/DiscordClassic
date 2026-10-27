@@ -115,8 +115,8 @@ export const settings = definePluginSettings({
         hidden: true,
     },
     hideClanTags: toggle("Server tags (blockable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
-    hideProfileFrames: toggle("Profile frames", "Removes the decorative border drawn around some profiles (e.g. candles, dripping wax)."),
-    hideProfileEffects: toggle("Profile effects", "Removes the animated overlay drawn over some profiles (glow, sparkles)."),
+    hideProfileFrames: toggle("Profile frames (blockable)", "Removes the decorative border drawn around some profiles (e.g. candles, dripping wax)."),
+    hideProfileEffects: toggle("Profile effects (blockable)", "Removes the animated overlay drawn over some profiles (glow, sparkles)."),
 
     sectionElsewhere: section("Handled elsewhere", "Already removable without this plugin."),
     handledElsewhere: {
@@ -194,6 +194,15 @@ const plugin = definePlugin({
             replacement: {
                 match: /(?<=,nameplate:)(\i)(?=,onClick:)/g,
                 replace: "$self.blocks(\"hideNameplates\",$1)?void 0:$1",
+            },
+        },
+        {
+            // Block mode: profiles are parsed without their effect and frame, so neither is fetched
+            // (code seen in a report, module 321191, discord/1.0.9265). Also applies to your own profile, locally.
+            find: "collectibles:void 0,profileEffect:void 0,profileFrame:void 0",
+            replacement: {
+                match: /return\{collectibles:(\i),profileEffect:(\i),profileFrame:(\i)\}/,
+                replace: "return{collectibles:$1,profileEffect:$self.blocks(\"hideProfileEffects\",$2)?void 0:$2,profileFrame:$self.blocks(\"hideProfileFrames\",$3)?void 0:$3}",
             },
         },
         // Freeze animations: inverse of Vencord's AlwaysAnimate patches.

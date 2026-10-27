@@ -29,6 +29,7 @@ Patches (no selector):
 | --- | --- | --- |
 | hideAvatarDecorations (Block mode) | `getAvatarDecorationURL` returns nothing, so no request | Same insertion point as Vencord's Decor plugin: incompatible with Decor. Likely working: report of 2026-10-27 12:33 shows no decoration element left in a member list that had 8. |
 | hideClanTags (Block mode) | clan badge URL builder (`find: "/clan-badges/"`) returns nothing | Written from Discord's code in GG's report (module 685073, discord/1.0.9265). Working: report of 2026-10-27 shows badge placeholders and no `clan-badges` media. |
+| hideProfileEffects, hideProfileFrames (Block mode) | profile collectibles parsed with `profileEffect`/`profileFrame` set to `undefined` (`find: "collectibles:void 0,profileEffect:void 0,profileFrame:void 0"`) | Written from Discord's code in GG's report (module 321191, discord/1.0.9265). Applies to every profile, yours included (locally). Not yet tried in GG's client. |
 | hideNameplates (Block mode) | member list rows get `nameplate: undefined` (`find: "onClickPremiumGuildIcon:"`) | Written from Discord's code in GG's report (module 66148, discord/1.0.9265). Member list only. The find matches 2 modules (row component and list), so the patch uses `all: true`; first version without it did not apply. Working: report of 2026-10-27 13:20 shows 0 nameplates in a member list, 12 counted as blocked, module 66148 patched. |
 | freezeAnimations | `canAnimate:` -> `!1` (all modules), nameplates `animate`/`loop` -> `!1` | Inverse of Vencord's AlwaysAnimate patches (Vencord 1.15.13, main of 2026-10-24). Not yet tried in GG's client. |
 
@@ -36,7 +37,7 @@ Known but not handled yet:
 
 - Gift button: `[aria-label='Send a gift']` never matched. Needs a report with the button visible, if it still exists.
 - Display name style upsell popup ("Give their style a spin", next to a profile popout): no selector yet. Needs a report taken while it is open (`texts` section).
-- Profile effects: handled (`hideProfileEffects`), CSS only, no patch yet. Profile frames are handled (`hideProfileFrames`), CSS only: no patch yet, the report now searches Discord code for `custom-profile-frame`.
+- Profile effects and frames: handled (`hideProfileEffects`, `hideProfileFrames`), CSS in Hide mode, patch in Block mode (see table above).
 - Display name styles and chat bar GIF/sticker/emoji/apps buttons: not handled here, Discord has its own settings for them (`displayNameStylesEnabled`, `gifButtonEnabled`, `stickerButtonEnabled`, `emojiButtonEnabled`, `appsButtonEnabled` in AccessibilityStore, per Vencord's discord-types). The plugin's "Open Accessibility" button calls `SettingsRouter.openUserSettings("accessibility_panel")`, confirmed working by GG on 2026-10-27, and GG confirmed the name styles setting there.
 - Profile themes (gradient profile background): not handled here, Vencord's built-in NoProfileThemes plugin already patches it (`find: "hasThemeColors(){"`).
 

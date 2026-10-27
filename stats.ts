@@ -9,12 +9,14 @@
 
 import * as DataStore from "@api/DataStore";
 
-export type StatKey = "hideAvatarDecorations" | "hideNameplates" | "hideClanTags" | "urlBlocking";
+export type StatKey = "hideAvatarDecorations" | "hideNameplates" | "hideClanTags" | "hideProfileEffects" | "hideProfileFrames" | "urlBlocking";
 
 export const STAT_LABELS: Record<StatKey, string> = {
     hideAvatarDecorations: "Avatar decorations",
     hideNameplates: "Nameplates",
     hideClanTags: "Server tags",
+    hideProfileEffects: "Profile effects",
+    hideProfileFrames: "Profile frames",
     urlBlocking: "Blocked by URL",
 };
 
@@ -24,6 +26,10 @@ const ESTIMATED_KB: Record<StatKey, number> = {
     hideAvatarDecorations: 60,
     hideNameplates: 150,
     hideClanTags: 2,
+    // Animated full-profile overlay.
+    hideProfileEffects: 300,
+    // Several layer images per frame.
+    hideProfileFrames: 150,
     urlBlocking: 60,
 };
 
@@ -43,8 +49,9 @@ export async function loadStats() {
 function idOf(item: unknown): string | undefined {
     if (item == null || item === "") return;
     if (typeof item !== "object") return String(item);
-    const { asset } = (item as { asset?: unknown; });
+    const { asset, skuId } = (item as { asset?: unknown; skuId?: unknown; });
     if (typeof asset === "string") return asset;
+    if (typeof skuId === "string") return skuId;
     try {
         return JSON.stringify(item);
     } catch {
