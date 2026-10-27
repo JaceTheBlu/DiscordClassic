@@ -34,6 +34,7 @@ Known but not handled yet:
 
 - Gift button: `[aria-label='Send a gift']` never matched. Needs a report with the button visible, if it still exists.
 - Display name style upsell popup ("Give their style a spin", next to a profile popout): no selector yet. Needs a report taken while it is open (`texts` section).
+- Display name styles and chat bar GIF/sticker/emoji/apps buttons: not handled here, Discord has its own settings for them (`displayNameStylesEnabled`, `gifButtonEnabled`, `stickerButtonEnabled`, `emojiButtonEnabled`, `appsButtonEnabled` in AccessibilityStore, per Vencord's discord-types). Location in the settings UI not yet confirmed.
 - Profile themes (gradient profile background): not handled here, Vencord's built-in NoProfileThemes plugin already patches it (`find: "hasThemeColors(){"`).
 
 ## Selector report

@@ -34,6 +34,8 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 
 Profile themes (gradient profile backgrounds): enable Vencord's built-in **NoProfileThemes** plugin.
 
+Discord itself can turn off some of these, no plugin needed (setting names from Vencord's typings of Discord's AccessibilityStore, look under User Settings > Accessibility): display name styles (fonts and glow on names), and the GIF, sticker, emoji and apps buttons of the chat bar.
+
 Planned: profile effects, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps).
 
 ## Selector report
