@@ -15,7 +15,7 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 
 - Code, comments and identifiers in English.
 - Never claim a Discord selector or module name is correct without checking it in DevTools: they change every build. Mark unverified ones as such.
-- Selectors on stable attributes only (`data-list-item-id`, `href`, `aria-label`), never hashed classes.
+- Prefer stable attributes (`data-list-item-id`, `href`, `aria-label`). When none exists, `[class*='readablePrefix']`, never a full hashed class.
 - Adding an option = one `toggle(...)` in `settings` + one entry in `RULES` + one row in `docs/selectors.md` and in the README table.
 - Defaults: off, except obvious marketing (Nitro, Shop, gift).
 - Phase 2 (upstream PR to `Vendicated/Vencord`): replace key CSS rules with patches, move author to `Devs`, run `pnpm lint`.

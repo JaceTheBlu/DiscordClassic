@@ -19,18 +19,32 @@ const KEYWORDS = [
     "premium",
     "shop",
     "gift",
-    "orb",
+    // "orb" alone also matches "colorBrand" and "indicatorBottom".
+    "orbs",
 ] as const;
 
 const STABLE_ATTRS = ["data-list-item-id", "aria-label", "href", "role", "data-tab-id"];
 const MAX_SAMPLES = 8;
+const TREE_DEPTH = 3;
+const TREE_WIDTH = 6;
 
 interface ElementInfo {
     tag: string;
     classes: string[];
     attrs: Record<string, string>;
+    src?: string;
     // Closest ancestor that carries a stable attribute, to anchor a selector on.
     anchor?: { tag: string; attrs: Record<string, string>; depth: number; };
+    // Descendants, for cases where the visible part has no telling class (e.g. a nameplate background).
+    children?: TreeNode[];
+}
+
+interface TreeNode {
+    tag: string;
+    classes: string[];
+    // Media URL without query string, to find CDN paths worth blocking at the network level.
+    src?: string;
+    children?: TreeNode[];
 }
 
 // "nameplated__91a9d" -> "nameplated"
@@ -50,6 +64,7 @@ function describe(el: Element): ElementInfo {
         tag: el.tagName.toLowerCase(),
         classes: [...el.classList].map(stripHash),
         attrs: stableAttrs(el),
+        src: mediaSrc(el),
     };
 
     let parent = el.parentElement;
@@ -61,6 +76,21 @@ function describe(el: Element): ElementInfo {
         }
     }
     return info;
+}
+
+function mediaSrc(el: Element) {
+    const src = el.getAttribute("src") ?? el.getAttribute("href") ?? el.getAttribute("xlink:href");
+    return src && /^https?:/.test(src) ? src.split("?")[0] : undefined;
+}
+
+function tree(el: Element, depth: number): TreeNode[] | undefined {
+    if (depth === 0 || !el.children.length) return undefined;
+    return [...el.children].slice(0, TREE_WIDTH).map(child => ({
+        tag: child.tagName.toLowerCase(),
+        classes: [...child.classList].map(stripHash),
+        src: mediaSrc(child),
+        children: tree(child, depth - 1),
+    }));
 }
 
 function countMatches(selector: string) {
@@ -81,7 +111,7 @@ function scanKeywords() {
         const samples: ElementInfo[] = [];
 
         for (const el of elements) {
-            const info = describe(el);
+            const info: ElementInfo = { ...describe(el), children: tree(el, TREE_DEPTH) };
             // One sample per distinct shape, so a list of 1000 members stays readable.
             const key = info.tag + info.classes.join(".");
             if (seen.has(key)) continue;

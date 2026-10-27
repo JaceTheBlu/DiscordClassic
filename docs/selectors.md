@@ -2,15 +2,21 @@
 
 Back to [CLAUDE.md](../CLAUDE.md).
 
-Status of each `RULES` entry in `index.tsx`. Nothing is verified yet.
+Status of each `RULES` entry in `index.tsx`. "verified" means the selector report matched the expected elements on that build.
 
 | Option | Selector | Status | Checked on (date, Discord build) |
 | --- | --- | --- | --- |
-| hideNitroTab | `[data-list-item-id$='___nitro']` | unverified | |
-| hideShop | `[data-list-item-id$='___shop']` | unverified | |
-| hideGiftButton | `[aria-label='Send a gift']` | unverified, depends on client language | |
-| hideQuests | `[data-list-item-id$='___quests']` | unverified | |
-| hideAvatarDecorations | `[class*='avatarDecoration']` | unverified, class based (fragile) | |
+| hideNitroTab | `[data-list-item-id$='___nitro']` | unverified (report taken outside the DM list) | |
+| hideShop | `[data-list-item-id$='___shop']` | unverified (report taken outside the DM list) | |
+| hideGiftButton | `[aria-label='Send a gift']` | no match with a channel open: wrong selector or button absent | 2026-10-27, discord/1.0.9265 |
+| hideQuests | `[data-list-item-id$='___quests']` | unverified (report taken outside the DM list) | |
+| hideAvatarDecorations | `img[class*='avatarDecoration']` | verified, class based | 2026-10-27, discord/1.0.9265 |
+| hideClanTags | `[class*='clanTag']` | verified, class based | 2026-10-27, discord/1.0.9265 |
+
+Known but not handled yet:
+
+- Nameplates: member rows carry a `nameplated` class on `childContainer`, but hiding it would hide the whole row. The background element is still to be found (report `children` field).
+- Quest icon in member activity: `svg[class*='questsIcon']`.
 
 ## Selector report
 

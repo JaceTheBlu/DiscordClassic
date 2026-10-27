@@ -54,19 +54,22 @@ const settings = definePluginSettings({
     hideQuests: toggle("Hide Quests"),
     // Other users' cosmetics
     hideAvatarDecorations: toggle("Hide avatar decorations"),
+    hideClanTags: toggle("Hide server tags next to usernames"),
 });
 
 type RuleKey = keyof typeof settings.store;
 
-// UNVERIFIED placeholders: Discord changes its markup every build.
-// Validate each selector in DevTools (see docs/selectors.md) before trusting it.
-// Only target stable attributes (data-list-item-id, href, aria-label), never hashed classes.
+// Validation status of each selector lives in docs/selectors.md: Discord changes its markup every build.
+// Prefer stable attributes (data-list-item-id, href, aria-label). When none exists, match the
+// readable class prefix with [class*=...], never the full hashed class.
 const RULES: Record<RuleKey, string> = {
     hideNitroTab: "[data-list-item-id$='___nitro']",
     hideShop: "[data-list-item-id$='___shop']",
     hideGiftButton: "[aria-label='Send a gift']",
     hideQuests: "[data-list-item-id$='___quests']",
-    hideAvatarDecorations: "[class*='avatarDecoration']",
+    // Only the image: the matching svg container also wraps the avatar itself.
+    hideAvatarDecorations: "img[class*='avatarDecoration']",
+    hideClanTags: "[class*='clanTag']",
 };
 
 export default definePlugin({
