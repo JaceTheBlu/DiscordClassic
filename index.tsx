@@ -78,7 +78,7 @@ const settings = definePluginSettings({
 
     sectionCosmetics: section("Other users' cosmetics"),
     hideAvatarDecorations: toggle("Avatar decorations (filterable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
-    hideClanTags: toggle("Server tags", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
+    hideClanTags: toggle("Server tags (filterable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
 });
 
 // Validation status of each selector lives in docs/selectors.md: Discord changes its markup every build.
@@ -91,15 +91,18 @@ const RULES = {
     hideQuests: "[data-list-item-id$='___quests']",
     // Only the image: the matching svg container also wraps the avatar itself.
     hideAvatarDecorations: "img[class*='avatarDecoration']",
-    hideClanTags: "[class*='clanTag']",
+    // DM list and member list use different class names for the same chip.
+    hideClanTags: "[class*='clanTag'], span[class*='guildTag']",
 } satisfies Partial<Record<keyof typeof settings.store, string>>;
 
 type RuleKey = keyof typeof RULES;
 
-// Media URL patterns blocked in Filter mode. Empty until confirmed from a selector report
-// (its "media" section lists the CDN paths seen on screen). Never add a guessed pattern.
+// Media URL patterns blocked in Filter mode, only from URLs seen in a selector report
+// ("media" section and "src" fields). Never add a guessed pattern.
 const FILTERS: Partial<Record<RuleKey, RegExp[]>> = {
-    hideAvatarDecorations: [],
+    // Also serves Shop previews, which stay blank while this is active.
+    hideAvatarDecorations: [/^https:\/\/cdn\.discordapp\.com\/media\/v1\/collectibles-shop\//],
+    hideClanTags: [/^https:\/\/cdn\.discordapp\.com\/clan-badges\//],
 };
 
 export default definePlugin({

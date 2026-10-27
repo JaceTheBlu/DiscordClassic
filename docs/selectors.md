@@ -6,12 +6,19 @@ Status of each `RULES` entry in `index.tsx`. "verified" means the selector repor
 
 | Option | Selector | Status | Checked on (date, Discord build) |
 | --- | --- | --- | --- |
-| hideNitroTab | `[data-list-item-id$='___nitro']` | unverified (report taken outside the DM list) | |
-| hideShop | `[data-list-item-id$='___shop']` | unverified (report taken outside the DM list) | |
+| hideNitroTab | `[data-list-item-id$='___nitro']` | verified (href `/store`) | 2026-10-27, discord/1.0.9265 |
+| hideShop | `[data-list-item-id$='___shop']` | verified (href `/shop`) | 2026-10-27, discord/1.0.9265 |
 | hideGiftButton | `[aria-label='Send a gift']` | no match with a channel open: wrong selector or button absent | 2026-10-27, discord/1.0.9265 |
-| hideQuests | `[data-list-item-id$='___quests']` | unverified (report taken outside the DM list) | |
+| hideQuests | `[data-list-item-id$='___quests']` | verified (href `/quest-home`) | 2026-10-27, discord/1.0.9265 |
 | hideAvatarDecorations | `img[class*='avatarDecoration']` | verified, class based | 2026-10-27, discord/1.0.9265 |
-| hideClanTags | `[class*='clanTag']` | verified, class based | 2026-10-27, discord/1.0.9265 |
+| hideClanTags | `[class*='clanTag'], span[class*='guildTag']` | verified, class based (`clanTag` in DMs, `guildTag` in member list) | 2026-10-27, discord/1.0.9265 |
+
+Filter mode patterns (seen in reports, 2026-10-27, discord/1.0.9265):
+
+| Option | URL prefix |
+| --- | --- |
+| hideAvatarDecorations | `https://cdn.discordapp.com/media/v1/collectibles-shop/` (also used by Shop previews) |
+| hideClanTags | `https://cdn.discordapp.com/clan-badges/` |
 
 Known but not handled yet:
 
