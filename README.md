@@ -26,6 +26,7 @@ Settings are grouped by zone, each with a short explanation in the Vencord setti
 | Marketing | Gift button | on |
 | Recent additions | Quests | off |
 | Other users' cosmetics | Avatar decorations (filterable) | off |
+| Other users' cosmetics | Nameplates (filterable) | off |
 | Other users' cosmetics | Server tags (filterable) | off |
 
 Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).

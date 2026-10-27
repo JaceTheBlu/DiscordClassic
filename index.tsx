@@ -74,10 +74,11 @@ const settings = definePluginSettings({
     hideGiftButton: toggle("Gift button", "Removes the gift icon from the message input bar.", true),
 
     sectionRecent: section("Recent additions"),
-    hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list."),
+    hideQuests: toggle("Quests", "Removes the Quests entry from the direct messages list and the quest icon in member activities."),
 
     sectionCosmetics: section("Other users' cosmetics"),
     hideAvatarDecorations: toggle("Avatar decorations (filterable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
+    hideNameplates: toggle("Nameplates (filterable)", "Removes the image or animation drawn behind some usernames in the member list."),
     hideClanTags: toggle("Server tags (filterable)", "Removes the small server badge shown next to usernames (e.g. CHB, SEP)."),
 });
 
@@ -88,9 +89,11 @@ const RULES = {
     hideNitroTab: "[data-list-item-id$='___nitro']",
     hideShop: "[data-list-item-id$='___shop']",
     hideGiftButton: "[aria-label='Send a gift']",
-    hideQuests: "[data-list-item-id$='___quests']",
+    hideQuests: "[data-list-item-id$='___quests'], svg[class*='questsIcon']",
     // Only the image: the matching svg container also wraps the avatar itself.
     hideAvatarDecorations: "img[class*='avatarDecoration']",
+    // The "nameplated" class sits on the whole row: only its first child holds the background.
+    hideNameplates: "[class*='nameplated'] > [class*='container']:first-child",
     // DM list and member list use different class names for the same chip.
     hideClanTags: "[class*='clanTag'], span[class*='guildTag']",
 } satisfies Partial<Record<keyof typeof settings.store, string>>;
@@ -99,9 +102,12 @@ type RuleKey = keyof typeof RULES;
 
 // Media URL patterns blocked in Filter mode, only from URLs seen in a selector report
 // ("media" section and "src" fields). Never add a guessed pattern.
+// Decorations, nameplates and Shop previews share one CDN prefix: filtering one blocks them all.
+const COLLECTIBLES = /^https:\/\/cdn\.discordapp\.com\/media\/v1\/collectibles-shop\//;
+
 const FILTERS: Partial<Record<RuleKey, RegExp[]>> = {
-    // Also serves Shop previews, which stay blank while this is active.
-    hideAvatarDecorations: [/^https:\/\/cdn\.discordapp\.com\/media\/v1\/collectibles-shop\//],
+    hideAvatarDecorations: [COLLECTIBLES],
+    hideNameplates: [COLLECTIBLES],
     hideClanTags: [/^https:\/\/cdn\.discordapp\.com\/clan-badges\//],
 };
 
