@@ -1,0 +1,13 @@
+{
+    "name": "DiscordClassic",
+    "build": { "dockerfile": "Dockerfile" },
+    // The plugin repo is mounted inside the Vencord tree, so its imports (@api, @utils) resolve.
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/node/Vencord/src/userplugins/DiscordClassic,type=bind",
+    "workspaceFolder": "/home/node/Vencord/src/userplugins/DiscordClassic",
+    "remoteUser": "node",
+    "customizations": {
+        "vscode": {
+            "extensions": ["dbaeumer.vscode-eslint"]
+        }
+    }
+}

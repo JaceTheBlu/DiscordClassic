@@ -1,6 +1,7 @@
 /*
- * DiscordClassic, a Vencord userplugin
- * Hides Discord marketing and recent additions to get a "classic" UI back.
+ * Vencord, a Discord client mod
+ * Copyright (c) 2026 Vendicated and contributors
+ * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { definePluginSettings } from "@api/Settings";
@@ -52,11 +53,11 @@ type RuleKey = keyof typeof settings.store;
 // Validate each selector in DevTools (see docs/selectors.md) before trusting it.
 // Only target stable attributes (data-list-item-id, href, aria-label), never hashed classes.
 const RULES: Record<RuleKey, string> = {
-    hideNitroTab: `[data-list-item-id$="___nitro"]`,
-    hideShop: `[data-list-item-id$="___shop"]`,
-    hideGiftButton: `[aria-label="Send a gift"]`,
-    hideQuests: `[data-list-item-id$="___quests"]`,
-    hideAvatarDecorations: `[class*="avatarDecoration"]`,
+    hideNitroTab: "[data-list-item-id$='___nitro']",
+    hideShop: "[data-list-item-id$='___shop']",
+    hideGiftButton: "[aria-label='Send a gift']",
+    hideQuests: "[data-list-item-id$='___quests']",
+    hideAvatarDecorations: "[class*='avatarDecoration']",
 };
 
 export default definePlugin({
