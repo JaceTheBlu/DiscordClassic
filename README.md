@@ -16,6 +16,10 @@ A [Vencord](https://github.com/Vendicated/Vencord) userplugin that hides Discord
 
 Planned: profile effects, profile themes, orbs, activities, friends activity bar, extra badges, chat bar buttons (GIF, stickers, apps), static animated banners (patch).
 
+## Selector report
+
+Selectors break when Discord updates. Toolbox menu > **Copy selector report** copies a JSON report of what each rule matches and of candidate elements, see [docs/selectors.md](docs/selectors.md#selector-report).
+
 ## Install
 
 Vencord must be built from source.

@@ -5,7 +5,10 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
+import { copyWithToast } from "@utils/discord";
 import definePlugin, { OptionType } from "@utils/types";
+
+import { buildReport } from "./diagnostics";
 
 const STYLE_ID = "vc-discord-classic";
 
@@ -22,6 +25,12 @@ function applyStyle() {
         document.head.appendChild(el);
     }
     el.textContent = css;
+}
+
+// Hidden elements stay in the DOM, so the scan sees them even while rules are active.
+function copySelectorReport() {
+    const report = buildReport(RULES, settings.store);
+    copyWithToast(JSON.stringify(report, null, 2), "DiscordClassic: selector report copied");
 }
 
 function removeStyle() {
@@ -66,6 +75,10 @@ export default definePlugin({
     // TODO: replace 0n with your Discord user ID. Move to Devs in src/utils/constants.ts for the upstream PR.
     authors: [{ name: "JaceTheBlu", id: 0n }],
     settings,
+    toolboxActions: {
+        "Copy selector report": copySelectorReport,
+    },
+    copySelectorReport,
     start: applyStyle,
     stop: removeStyle,
 });

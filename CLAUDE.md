@@ -5,6 +5,7 @@ Vencord userplugin (`index.tsx` at the root, loaded as `src/userplugins/DiscordC
 ## Map
 
 - `index.tsx`: the whole plugin. `settings` declares the toggles, `RULES` maps each toggle to a CSS selector, `applyStyle` writes one `<style id="vc-discord-classic">` and re-runs on every setting change.
+- `diagnostics.ts`: `buildReport` scans the DOM for selector discovery, exposed as the **Copy selector report** toolbox action. Discovery only, it never picks selectors.
 - `docs/selectors.md`: selector validation status and DevTools procedure. Read it before touching `RULES`.
 - `README.md`: user facing install and option list.
 - `.devcontainer/`: build, lint and typecheck inside a real Vencord tree, see [.devcontainer/CLAUDE.md](.devcontainer/CLAUDE.md).
