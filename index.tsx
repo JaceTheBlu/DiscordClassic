@@ -40,7 +40,7 @@ function stop() {
 
 // Hidden elements stay in the DOM, so the scan sees them even while rules are active.
 function copySelectorReport() {
-    const report = buildReport(RULES, settings.store);
+    const report = buildReport(RULES, settings.store, plugin.patches!.map(p => String(p.find)));
     copyWithToast(JSON.stringify(report, null, 2), "DiscordClassic: selector report copied");
 }
 
@@ -88,7 +88,7 @@ const settings = definePluginSettings({
 
     sectionCosmetics: section("Other users' cosmetics"),
     hideAvatarDecorations: toggle("Avatar decorations (blockable)", "Removes the animated frames drawn around avatars. The avatar itself stays."),
-    hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list."),
+    hideNameplates: toggle("Nameplates (blockable)", "Removes the image or animation drawn behind some usernames in the member list. Blocking covers the member list only."),
     freezeAnimations: {
         type: OptionType.BOOLEAN,
         displayName: "Freeze animations",
@@ -128,7 +128,7 @@ const FILTERS: Partial<Record<RuleKey, RegExp[]>> = {
     hideClanTags: [/^https:\/\/cdn\.discordapp\.com\/clan-badges\//],
 };
 
-export default definePlugin({
+const plugin = definePlugin({
     name: "DiscordClassic",
     description: "Hides Discord marketing and recent additions for a classic UI",
     // TODO: replace 0n with your Discord user ID. Move to Devs in src/utils/constants.ts for the upstream PR.
@@ -142,6 +142,22 @@ export default definePlugin({
             replacement: {
                 match: /(?<=function \i\(\i\){)(?=let{avatarDecoration)/,
                 replace: "if($self.blocks(\"hideAvatarDecorations\"))return;",
+            },
+        },
+        {
+            // Block mode: the badge URL builder returns nothing (code seen in a report, discord/1.0.9265).
+            find: "/clan-badges/",
+            replacement: {
+                match: /(?=let{CDN_HOST:\i}=window\.GLOBAL_ENV;if\(null==\i\)return;let \i=\i\.\i\[\i\];return`https:\/\/\$\{\i\}\/clan-badges\/)/,
+                replace: "if($self.blocks(\"hideClanTags\"))return;",
+            },
+        },
+        {
+            // Block mode: member list rows get no nameplate, so nothing is fetched (code seen in a report, discord/1.0.9265).
+            find: "onClickPremiumGuildIcon:",
+            replacement: {
+                match: /(?<=,nameplate:)(\i)(?=,onClick:)/g,
+                replace: "$self.blocks(\"hideNameplates\")?void 0:$1",
             },
         },
         // Freeze animations: inverse of Vencord's AlwaysAnimate patches.
@@ -175,3 +191,5 @@ export default definePlugin({
     start: apply,
     stop,
 });
+
+export default plugin;
